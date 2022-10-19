@@ -1,3 +1,4 @@
+using Amazon.S3.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,7 @@ namespace CloudNativeWebApplications
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
+            //await GetBucketList();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -22,5 +24,14 @@ namespace CloudNativeWebApplications
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        private static async Task GetBucketList()
+        {
+            ListBucketsResponse response = await Common.CommonHelper.s3Client.ListBucketsAsync();
+            foreach (S3Bucket bucket in response.Buckets)
+            {
+
+            }
+        }
     }
 }

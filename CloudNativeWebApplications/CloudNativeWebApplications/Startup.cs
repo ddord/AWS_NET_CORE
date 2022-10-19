@@ -24,6 +24,17 @@ namespace CloudNativeWebApplications
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddAuthentication("Cookies").AddCookie("Cookies", config =>
+            {
+                config.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                config.LoginPath = "/Home/Login";
+                config.LogoutPath = "/Home/Logout";
+                config.Cookie.Name = "Management.Authentication";
+            });
+            services.AddSession(option =>
+            {
+                option.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,8 +55,10 @@ namespace CloudNativeWebApplications
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCookiePolicy();
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
