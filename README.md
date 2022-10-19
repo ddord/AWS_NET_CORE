@@ -1,0 +1,1 @@
+# AWS_NET_CORE
