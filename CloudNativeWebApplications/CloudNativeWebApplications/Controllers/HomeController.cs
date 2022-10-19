@@ -73,7 +73,7 @@ namespace CloudNativeWebApplications.Controllers
 
                         if (string.IsNullOrEmpty(returnUrl))
                         {
-                            returnMsg = "/Board/AnnouncementsManagement";
+                            returnMsg = "/Index";
                         }
                         else
                         {
