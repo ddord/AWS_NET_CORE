@@ -1,0 +1,183 @@
+﻿@{
+    Layout = null;
+}
+<html lang="en">
+<head>
+    <title>M-Market Registration</title>
+    <link rel="stylesheet" href="~/css/common.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <style>
+        .msg-error {
+            visibility: visible;
+            color: #e74c3c;
+        }
+
+        .form-control-success {
+            border-color: #2ecc71;
+        }
+
+        .form-control-error {
+            border-color: #e74c3c;
+        }
+
+        .msg {
+            visibility: hidden;
+        }
+    </style>
+    <script>
+        function registerUser() {
+            var userID = $('#txtUserID');
+            var email = $('#txtEmail');
+            var password = $('#txtPassword');
+            var comfirmPassword = $('#txtPassword');
+
+            if (checkLength(userID, 5, 50) == false) {
+                return;
+            }
+
+            if (checkEmail(email) == false) {
+                return;
+            }
+
+            if (checkLength(password, 10, 50) == false) {
+                return;
+            }
+
+            if (checkComparePassword(password, comfirmPassword) == false) {
+                return;
+            }
+
+            var param = {
+                userID: userID.val().trim(),
+                email: email.val().trim(),
+                password: password.val().trim()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("RegisterProcess")",
+                data: param,
+                dataType: "json",
+                success: function (data) {
+                    var jsonValue = JSON.parse(data);
+                    if (jsonValue.result == "True") {
+                        location.href = jsonValue.msg;
+                    } else {
+                        alert(jsonValue.msg);
+                    }
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        }
+
+        function fnGetQuery() {
+            var url = document.location.href;
+            var qs = url.substring(url.indexOf('?') + 1).split('&');
+            for (var i = 0, result = {}; i < qs.length; i++) {
+                qs[i] = qs[i].split('=');
+                result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+            }
+
+            return result;
+        }
+
+        function checkLength(input, min, max) {
+            var result;
+            if (input.val().length < min) {
+                result = showError(input, input.id + ' must be at least ' + min + ' characters')
+            } else if (input.val().length > max) {
+                result = showError(input, input.id + ' must be less than ' + max + ' characters')
+            } else {
+                result = showSuccess(input);
+            }
+
+            return result;
+        }
+
+        function checkEmail(email) {
+            var result;
+            let regex = new RegExp('[a-z0-9]+@@[a-z]+\.[a-z]{2,3}');
+
+            if (regExp.test(email.val().trim())) {
+                result = showSuccess(email);
+            } else {
+                result = showError(email, 'Please Write right Email');
+            }
+
+            return result;
+        }
+
+        function checkComparePassword(pass, comparePass) {
+            var result;
+
+            if (pass.trim() == comparePass.trim()) {
+                result = showSuccess(pass);
+            } else {
+                result = showError(comparePass, 'Please check your password');
+            }
+
+            return result;
+        }
+
+        function showError(input, msg) {
+            input.classList.toggle('form-control-error');
+
+            const small = document.querySelector('small');
+            small.classList.toggle('msg-error');
+
+            small.innerText = msg;
+            input.val('');
+            return false;
+        }
+
+        function showSuccess(input) {
+            input.classList.toggle('form-control-success');
+            return true;
+        }
+
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div class="container">
+            <div class="outer">
+                <div class="inner">
+                    <div class="main_w">
+                        <div class="main_box">
+                            <h2 style="color:#fff">Register With Us</h2>
+                            <ul>
+                                <li>
+                                    <label for="txtUserID">User ID</label>
+                                    <input type="text" id="txtUserID" style="width: 300px;" placeholder="Enter usename">
+                                    <small id="idMsg"></small>
+                                </li>
+                                <li>
+                                    <label for="txtEmail">Email</label>
+                                    <input type="email" id="txtEmail" style="width: 300px;" placeholder="Enter email">
+                                    <small id="emailMsg"></small>
+                                </li>
+                                <li>
+                                    <label for="txtPassword">Password</label>
+                                    <input type="password" id="txtPassword" style="width: 300px;" placeholder="Enter password">
+                                    <small id="passwordMsg"></small>
+                                </li>
+                                <li>
+                                    <label for="txtConfirmPassword">Confirm Password</label>
+                                    <input type="password" id="txtConfirmPassword" style="width: 300px;" placeholder="Enter password again" min="6" max="25">
+                                    <small id="confirmPasswordMsg"></small>
+                                </li>
+
+                                <li class="main_btn">
+                                    <a runat="server" id="btnRegister" style="cursor:pointer;" onclick="registerUser();">R E G I S T E R</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

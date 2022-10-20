@@ -24,6 +24,17 @@ namespace CloudNativeWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddAuthentication("Cookies").AddCookie("Cookies", config =>
+            {
+                config.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                config.LoginPath = "/Home/Login";
+                config.LogoutPath = "/Home/Logout";
+                config.Cookie.Name = "Management.Authentication";
+            });
+            services.AddSession(option =>
+            {
+                option.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,14 +54,16 @@ namespace CloudNativeWeb
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCookiePolicy();
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Login}");
             });
         }
     }

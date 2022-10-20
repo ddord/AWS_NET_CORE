@@ -40,6 +40,11 @@ namespace CloudNativeWeb.Controllers
             return Redirect("/Home/Login");
         }
 
+        public IActionResult Registration()
+        {
+            return View();
+        }
+
         public IActionResult LoginProcess(string id, string password, string returnUrl)
         {
             ClaimsIdentity identity = null;

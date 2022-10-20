@@ -1,0 +1,90 @@
+﻿@{
+    Layout = null;
+    string account = null;
+    string password = null;
+#if DEBUG
+    account = "testuser01";
+    password = "testuser01";
+#endif
+}
+<html lang="en">
+<head>
+    <title>M-Market Login</title>
+    <link rel="stylesheet" href="~/css/common.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        function fnLogin() {
+            var param = {
+                id: $('#txtId').val(),
+                password: $('#txtPwd').val(),
+                returnUrl: (fnGetQuery().ReturnUrl ? fnGetQuery().ReturnUrl : "")
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("LoginProcess")",
+                data: param,
+                dataType: "json",
+                success: function (data) {
+                    var jsonValue = JSON.parse(data);
+                    if (jsonValue.result == "True") {
+                        location.href = jsonValue.msg;
+                    } else {
+                        alert(jsonValue.msg);
+                    }
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+        }
+
+        function fnGetQuery() {
+            var url = document.location.href;
+            var qs = url.substring(url.indexOf('?') + 1).split('&');
+            for (var i = 0, result = {}; i < qs.length; i++) {
+                qs[i] = qs[i].split('=');
+                result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+            }
+            return result;
+        }
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div class="container">
+            <div class="outer">
+                <div class="inner">
+                    <div class="main_w">
+                        <div class="main_box">
+                            <img src="~/img/login_img.gif">
+                            <span style="color: white; display: block;">Login</span>
+                            <ul>
+                                <li>
+                                    <label>ID</label>
+                                    <input id="txtId" type="text" style="width:300px;" value="@account" />
+                                </li>
+                                <li>
+                                    <label>Password</label>
+                                    <input id="txtPwd" type="password" style="width:300px;" value="@password" />
+                                </li>
+                                <li>
+                                    <div style="text-align:right;text-decoration:underline;">
+                                        <a href="@Url.Action("Registration")" style="color:#fff">REGISTER</a>
+                                    </div>
+                                </li>
+                                <li class="main_btn">
+                                    <a runat="server" id="btnLogin" style="cursor:pointer;" onclick="fnLogin();">L O G I N</a>
+                                </li>
+                            </ul>
+                            <div id="infoMessage" class="loginInner error" style="visibility: hidden;">
+                                <img id="messageImage" class="error_message" src="Content/img/loading.gif" /><span id="messageText" class="error_message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
