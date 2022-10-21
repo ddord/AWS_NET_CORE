@@ -24,7 +24,7 @@ namespace CloudNativeWeb.Controllers
             _commonService = new CommonService();
         }
 
-        public IActionResult Index()
+        public IActionResult MovieList()
         {
             return View();
         }
@@ -77,7 +77,7 @@ namespace CloudNativeWeb.Controllers
                     {
                         identity = new ClaimsIdentity(new[] {
                             new Claim("UserId", id),
-                            new Claim("UserName", Convert.ToString(((object[])((System.Collections.Generic.IDictionary<string, object>)list[0]).Values)[1])),
+                            new Claim("Emaile", Convert.ToString(((object[])((System.Collections.Generic.IDictionary<string, object>)list[0]).Values)[1])),
                             new Claim(ClaimTypes.Role, "ADMIN")
                         }, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -87,7 +87,7 @@ namespace CloudNativeWeb.Controllers
 
                         if (string.IsNullOrEmpty(returnUrl))
                         {
-                            returnMsg = "/Index";
+                            returnMsg = "Home/MovieList";
                         }
                         else
                         {
@@ -103,6 +103,12 @@ namespace CloudNativeWeb.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult RegisterProcess(UserInfo models)
+        {
+            var result = _commonService.InsertUserInfo(models);
+            return Json(result);
         }
     }
 }

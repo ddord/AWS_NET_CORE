@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <title>M-Market Registration</title>
-    <link rel="stylesheet" href="~/css/common.css" />
+    <link rel="stylesheet" href="~/css/nonTemplaate.css" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <style>
         .msg-error {
@@ -26,10 +26,10 @@
     </style>
     <script>
         function registerUser() {
-            var userID = $('#txtUserID');
-            var email = $('#txtEmail');
-            var password = $('#txtPassword');
-            var comfirmPassword = $('#txtPassword');
+            var userID = $('#UserID');
+            var email = $('#Email');
+            var password = $('#Password');
+            var comfirmPassword = $('#ConfirmPassword');
 
             if (checkLength(userID, 5, 50) == false) {
                 return;
@@ -59,11 +59,14 @@
                 data: param,
                 dataType: "json",
                 success: function (data) {
-                    var jsonValue = JSON.parse(data);
-                    if (jsonValue.result == "True") {
-                        location.href = jsonValue.msg;
+                    var jsonValue = data;
+                    if (jsonValue == 1) {
+                        alert("Registration success");
+                        location.href = "Login";
+                    } else if (jsonValue == -1) {
+                        alert("Account exists.");
                     } else {
-                        alert(jsonValue.msg);
+                        alert("Registration failed");
                     }
                 },
                 error: function (response) {
@@ -86,9 +89,9 @@
         function checkLength(input, min, max) {
             var result;
             if (input.val().length < min) {
-                result = showError(input, input.id + ' must be at least ' + min + ' characters')
+                result = showError(input, input[0].id + ' must be at least ' + min + ' characters')
             } else if (input.val().length > max) {
-                result = showError(input, input.id + ' must be less than ' + max + ' characters')
+                result = showError(input, input[0].id + ' must be less than ' + max + ' characters')
             } else {
                 result = showSuccess(input);
             }
@@ -100,7 +103,7 @@
             var result;
             let regex = new RegExp('[a-z0-9]+@@[a-z]+\.[a-z]{2,3}');
 
-            if (regExp.test(email.val().trim())) {
+            if (regex.test(email.val().trim())) {
                 result = showSuccess(email);
             } else {
                 result = showError(email, 'Please Write right Email');
@@ -112,7 +115,7 @@
         function checkComparePassword(pass, comparePass) {
             var result;
 
-            if (pass.trim() == comparePass.trim()) {
+            if (pass.val().trim() == comparePass.val().trim()) {
                 result = showSuccess(pass);
             } else {
                 result = showError(comparePass, 'Please check your password');
@@ -122,18 +125,20 @@
         }
 
         function showError(input, msg) {
-            input.classList.toggle('form-control-error');
+            input[0].classList.toggle('form-control-error');
 
-            const small = document.querySelector('small');
-            small.classList.toggle('msg-error');
+            const small = input.siblings('small');
+            small[0].classList.toggle('msg-error');
 
-            small.innerText = msg;
+            small[0].innerText = msg;
             input.val('');
             return false;
         }
 
         function showSuccess(input) {
-            input.classList.toggle('form-control-success');
+            input[0].classList.toggle('form-control-success');
+            const small = input.siblings('small');
+            small[0].innerText = '';
             return true;
         }
 
@@ -149,24 +154,24 @@
                             <h2 style="color:#fff">Register With Us</h2>
                             <ul>
                                 <li>
-                                    <label for="txtUserID">User ID</label>
-                                    <input type="text" id="txtUserID" style="width: 300px;" placeholder="Enter usename">
-                                    <small id="idMsg"></small>
+                                    <label for="UserID">UserID</label>
+                                    <input type="text" id="UserID" style="width: 300px;" placeholder="Enter userId">
+                                    <small id="idMsg" style="display: block;"></small>
                                 </li>
                                 <li>
-                                    <label for="txtEmail">Email</label>
-                                    <input type="email" id="txtEmail" style="width: 300px;" placeholder="Enter email">
-                                    <small id="emailMsg"></small>
+                                    <label for="Email">Email</label>
+                                    <input type="email" id="Email" style="width: 300px;" placeholder="Enter email">
+                                    <small id="emailMsg" style="display: block;"></small>
                                 </li>
                                 <li>
-                                    <label for="txtPassword">Password</label>
-                                    <input type="password" id="txtPassword" style="width: 300px;" placeholder="Enter password">
-                                    <small id="passwordMsg"></small>
+                                    <label for="Password">Password</label>
+                                    <input type="password" id="Password" style="width: 300px;" placeholder="Enter password">
+                                    <small id="passwordMsg" style="display: block;"></small>
                                 </li>
                                 <li>
-                                    <label for="txtConfirmPassword">Confirm Password</label>
-                                    <input type="password" id="txtConfirmPassword" style="width: 300px;" placeholder="Enter password again" min="6" max="25">
-                                    <small id="confirmPasswordMsg"></small>
+                                    <label for="ConfirmPassword">Confirm Password</label>
+                                    <input type="password" id="ConfirmPassword" style="width: 300px;" placeholder="Enter password again" min="6" max="25">
+                                    <small id="confirmPasswordMsg" style="display: block;"></small>
                                 </li>
 
                                 <li class="main_btn">

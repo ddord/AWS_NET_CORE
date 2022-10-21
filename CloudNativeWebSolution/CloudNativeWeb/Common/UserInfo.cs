@@ -61,7 +61,7 @@ namespace CloudNativeWeb.Common
             {
                 if (m_Claims != null)
                 {
-                    return m_Claims.FindFirst("UserName").Value;
+                    return m_Claims.FindFirst("UserId").Value;
                 }
                 else
                 {

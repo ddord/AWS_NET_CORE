@@ -1,0 +1,179 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Movie List";
+}
+@section Scripts {
+    <script>
+        var CurrentIsActive;
+        var CurrentTitle;
+
+        function fnDocumentReadyCommon() {
+            fnSearch();
+        }
+
+        function fnSearch() {
+            if ($('#txtTitle').val().length != 0 && $('#txtTitle').val().length < 2) {
+                alert("검색어는 2글자 이상 입력 가능합니다.");
+                return;
+            }
+
+            CurrentIsActive = $('#txtIsActive').val();
+            CurrentTitle = $('#txtTitle').val();
+
+            fnSelectAnnouncementsList(1, true);
+        }
+
+        function fnSelectAnnouncementsList(page, reset) {
+            var param = {
+                pageSize: m_OptionPageSize,
+                page: page,
+                isActive: CurrentIsActive,
+                title: CurrentTitle
+            }
+
+            m_Ajax.Call('@Url.Action("SelectAnnouncementsList")', param, function (data) {
+                if (data.length > 0) {
+                    var tbodyHtml = "";
+                    $(data).each(function (i) {
+                        tbodyHtml += '<tr>';
+                        tbodyHtml += '  <td class="align-center">';
+                        tbodyHtml +=        (data[i].movieId ? data[i].movieId : "");
+                        tbodyHtml += '      <input type="hidden" class="hdnIndexNumber" value="' + data[i].movieId + '" />';
+                        tbodyHtml += '  </td>';
+                        tbodyHtml += '  <td>';
+                        tbodyHtml += '      <a onclick="fnCallEdit(this);">' + (data[i].title ? data[i].title : "") + '</a>';
+                        tbodyHtml += '  </td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].genre ? data[i].genre : "") + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].releaseTime ? data[i].releaseTime : "") + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].director ? data[i].director : "") + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5) + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].updateUser ? data[i].updateUser : "") + '</td>';
+                        tbodyHtml += '  <td class="align-center">';
+                        tbodyHtml += '      <input type="checkbox" disabled="disabled" '+(data[i].IsActive == true ? 'checked="checked"' : '')+' />';
+                        tbodyHtml += '  </td>';
+                        tbodyHtml += '</tr>';
+                    });
+                    $('#movieList').html(tbodyHtml);
+
+                    var startIndex = ((page - 1) * m_OptionPageSize) + 1;
+                    var endIndex = startIndex + $('#movieList').find('tr').length - 1;
+                    $('#totalCount').html(startIndex + ' - ' + endIndex + ' of ' + data[0].TotalCount + ' items');
+
+                    if (reset) {
+                        m_Page.Set(data[0].TotalCount, "fnSelectAnnouncementsList");
+                    }
+                } else {
+                    $('#movieList').html('<td colspan="5">The item does not exist.</td>');
+                    $('#totalCount').html(0 + ' - ' + 0 + ' of ' + 0 + ' items');
+                    if (reset) {
+                        m_Page.Set(0, "fnSelectAnnouncementsList");
+                    }
+                }
+
+                m_CurrentPage = page;
+                m_Page.AfterMove();
+            });
+        }
+
+        function fnCallAdd() {
+            m_Popup.Open("/Board/AnnouncementsRegistration", "Announcements", 1000, 790);
+        }
+
+        function fnCallEdit(elem) {
+            var indexNumber = $(elem).closest('tr').find('.hdnIndexNumber').val();
+            m_Popup.Open("/Board/AnnouncementsModification?indexNumber=" + indexNumber, "Announcements", 1000, 790);
+        }
+</script>
+}
+<div class="sub-content-padding">
+    <div class="subpage-header">
+        <h3 class="ft-darkblue">Movie List</h3>
+    </div>
+
+    <div class="subpage-body">
+        <div class="box-blue">
+            <ul class="search-wrap">
+                <li>
+                    <div class="form-label">
+                        <div class="control">
+                            <select id="txtIsActive" class="fm-def" style="width:120px;">
+                                <option value="ALL">All</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-label">
+                        <div class="control">
+                            <div class="date-wrap">
+                                <div class="date-input">
+                                    <input type="text" class="fm-def" id="txtTitle" placeholder="제목" value="" style="width:120px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div class="space-m"></div>
+            <div class="align-right">
+                <button class="btn sub-btn btn-basic-outline" onclick="fnSearch();"><i class="icon-fux-search m-r-xs"></i>Select</button>
+            </div>
+        </div>
+
+        <div class="space-l"></div>
+
+        <div class="dp-flex">
+            <div class="mr-auto">
+                <h5 class="ft-blue b">Movie List</h5>
+            </div>
+            <div class="ml-auto">
+                <button class="btn sub-btn btn-basic-outline" onclick="fnCallAdd();">New</button>
+            </div>
+        </div>
+
+        <div class="space-s"></div>
+
+        <div class="grd-wrap overflow-auto">
+            <table width="100%" class="grd">
+                <colgroup>
+                    <col width="5%" />
+                    <col />
+                    <col width="10%" />
+                    <col width="20%" />
+                    <col width="10%" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="align-center">Movie ID</th>
+                        <th class="align-center">Title</th>
+                        <th class="align-center">Genre</th>
+                        <th class="align-center">Director</th>
+                        <th class="align-center">Release Time</th>
+                        <th class="align-center">Update Date</th>
+                        <th class="align-center">Update User</th>
+                    </tr>
+                </thead>
+                <tbody id="movieList"></tbody>
+            </table>
+        </div>
+
+        <div class="space-m"></div>
+
+        <div class="pagination-wrap">
+            <div class="align-left"><span class="ft-gray ft-s" id="totalCount"></span></div>
+            <div class="align-center">
+                <ul class="pagination" id="pageField"></ul>
+            </div>
+            <div class="align-right"></div>
+        </div>
+    </div>
+</div>

@@ -43,7 +43,6 @@ C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolutio
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\CloudNativeWeb.TagHelpers.input.cache
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\CloudNativeWeb.TagHelpers.output.cache
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\CloudNativeWeb.RazorCoreGenerate.cache
-C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\Index.cshtml.g.cs
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\Login.cshtml.g.cs
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Shared\Error.cshtml.g.cs
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_Layout.cshtml.g.cs
@@ -58,3 +57,7 @@ C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolutio
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\CloudNativeWeb.pdb
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\CloudNativeWeb.genruntimeconfig.cache
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\Registration.cshtml.g.cs
+C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\MovieItemModification.cshtml.g.cs
+C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\MovieItemRegistration.cshtml.g.cs
+C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\MovieList.cshtml.g.cs
+C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_PopLayout.cshtml.g.cs

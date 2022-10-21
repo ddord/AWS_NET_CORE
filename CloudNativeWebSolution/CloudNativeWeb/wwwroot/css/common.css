@@ -3,6 +3,8 @@
 
 @charset "utf-8";
 @import url('https://fonts.googleapis.com/css2? family= Nanum+Gothic:wght@400;700;800 & display=swap');
+@import "layout.css";
+@import "icofont.css";
 
 /* common */
 *, ::after, ::before {
@@ -1524,19 +1526,3 @@ ol.lower {
     list-style-type: lower-alpha;
 }
 
-
-/* login */
-#wrapper { width: 100%; height: 100%; background:#1d4592;  }
-
-.container {width: 100%; height: 100%; margin: 0 auto; }
-.outer {display: table; width: 100%; height: 100%; }
-.inner {display:table-cell; vertical-align: middle; text-align: center;}
-
-.main_w {position: relative; display: inline-block; width:500px; height:600px; text-align:center; }
-.main_box { border:1px solid #bcdfef; padding:20px; margin-top:10px;color:#fff;}
-.main_box ul { margin-top:30px;  padding:0px;}
-.main_box li { margin-bottom:20px;}
-.main_box li label { width:80px; display:inline-block;}
-.main_box li.main_btn { margin-left:130px;}
-.main_box li.main_btn a{ background:#007eff; display:block; width:230px; padding:10px; color:#fff;}
-.main_box li.main_btn a:hover { background:#000;}
