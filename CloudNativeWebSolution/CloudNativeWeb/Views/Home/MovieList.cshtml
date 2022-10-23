@@ -4,7 +4,8 @@
 }
 @section Scripts {
     <script>
-        var CurrentIsActive;
+        var CurrentRating;
+        var CurrentGenre;
         var CurrentTitle;
 
         function fnDocumentReadyCommon() {
@@ -17,21 +18,21 @@
                 return;
             }
 
-            CurrentIsActive = $('#txtIsActive').val();
+            CurrentRating = $('#selectRating').val();
+            CurrentGenre = $('#selectGenre').val();
             CurrentTitle = $('#txtTitle').val();
 
-            fnSelectAnnouncementsList(1, true);
+            fnSelectMovieList(1, true);
         }
 
-        function fnSelectAnnouncementsList(page, reset) {
+        function fnSelectMovieList() {
             var param = {
-                pageSize: m_OptionPageSize,
-                page: page,
-                isActive: CurrentIsActive,
+                rating: CurrentRating,
+                genre: CurrentGenre,
                 title: CurrentTitle
             }
 
-            m_Ajax.Call('@Url.Action("SelectAnnouncementsList")', param, function (data) {
+            m_Ajax.Call('@Url.Action("SelectMovieList")', param, function (data) {
                 if (data.length > 0) {
                     var tbodyHtml = "";
                     $(data).each(function (i) {
@@ -55,23 +56,10 @@
                     });
                     $('#movieList').html(tbodyHtml);
 
-                    var startIndex = ((page - 1) * m_OptionPageSize) + 1;
-                    var endIndex = startIndex + $('#movieList').find('tr').length - 1;
-                    $('#totalCount').html(startIndex + ' - ' + endIndex + ' of ' + data[0].TotalCount + ' items');
-
-                    if (reset) {
-                        m_Page.Set(data[0].TotalCount, "fnSelectAnnouncementsList");
-                    }
                 } else {
                     $('#movieList').html('<td colspan="5">The item does not exist.</td>');
                     $('#totalCount').html(0 + ' - ' + 0 + ' of ' + 0 + ' items');
-                    if (reset) {
-                        m_Page.Set(0, "fnSelectAnnouncementsList");
-                    }
                 }
-
-                m_CurrentPage = page;
-                m_Page.AfterMove();
             });
         }
 
@@ -96,8 +84,9 @@
                 <li>
                     <div class="form-label">
                         <div class="control">
-                            <select id="txtIsActive" class="fm-def" style="width:120px;">
-                                <option value="ALL">All</option>
+                            <select id="selectRating" class="fm-def" style="width:120px;">
+                                <option value="11">All</option>
+                                <option value="0">0</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -107,6 +96,30 @@
                                 <option value="7">7</option>
                                 <option value="8">8</option>
                                 <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-label">
+                        <div class="control">
+                            <select id="selectGenre" class="fm-def" style="width:120px;">
+                                <option value="All">All</option>
+                                <option value="Action">Action</option>
+                                <option value="Animation">Animation</option>
+                                <option value="Comedy">Comedy</option>
+                                <option value="Crime">Crime</option>
+                                <option value="Drama">Drama</option>
+                                <option value="Experimental">Experimental</option>
+                                <option value="Fantasy">Fantasy</option>
+                                <option value="Historical">Historical</option>
+                                <option value="Horror">Horror</option>
+                                <option value="Romance">Romance</option>
+                                <option value="Science Fiction">Science Fiction</option>
+                                <option value="Thriller">Thriller</option>
+                                <option value="Western">Western</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                     </div>

@@ -110,5 +110,13 @@ namespace CloudNativeWeb.Controllers
             var result = _commonService.InsertUserInfo(models);
             return Json(result);
         }
+
+        public async Task<IActionResult> SelectMovieList(int rating, string genre, string title)
+        {
+            var result = await _commonService.SelectMovieList(rating, genre, title);
+            return Json(result);
+        }
+
+
     }
 }

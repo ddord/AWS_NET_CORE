@@ -1,4 +1,5 @@
 ﻿using Amazon;
+using Amazon.DynamoDBv2;
 using Amazon.Runtime;
 using Amazon.S3;
 using Microsoft.Extensions.Configuration;
@@ -10,9 +11,10 @@ using System.Threading.Tasks;
 
 namespace CloudNativeWeb.Common
 {
-    public class CommonHelper
+    public class CloudHelper
     {
         public static AmazonS3Client s3Client = GetAmazonS3Client();
+        public static AmazonDynamoDBClient dyClient = GetAmazonDynamoDBClient();
 
         private static AmazonS3Client GetAmazonS3Client()
         {
@@ -34,6 +36,18 @@ namespace CloudNativeWeb.Common
             EncryptionHelper helper = new EncryptionHelper();
             var connectionString = helper.Decrypt(builder.Build().GetSection("ConnectionStrings").GetSection("Main").Value);
             return connectionString;
+        }
+
+        private static AmazonDynamoDBClient GetAmazonDynamoDBClient()
+        {
+            var builder = new ConfigurationBuilder()
+                                .SetBasePath(Directory.GetCurrentDirectory())
+                                .AddJsonFile("AppSettings.json");
+            var accessKeyID = builder.Build().GetSection("AWSCredentials").GetSection("AccesskeyID").Value;
+            var secretKey = builder.Build().GetSection("AWSCredentials").GetSection("Secretaccesskey").Value;
+            BasicAWSCredentials credentials = new BasicAWSCredentials(accessKeyID, secretKey);
+            dyClient = new AmazonDynamoDBClient(credentials, RegionEndpoint.USEast1);
+            return dyClient;
         }
 
         //public static string GetRDSConnectionString()

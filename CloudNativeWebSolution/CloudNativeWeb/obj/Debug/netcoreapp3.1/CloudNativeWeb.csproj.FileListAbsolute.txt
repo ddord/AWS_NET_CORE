@@ -61,3 +61,4 @@ C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolutio
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\MovieItemRegistration.cshtml.g.cs
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Home\MovieList.cshtml.g.cs
 C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_PopLayout.cshtml.g.cs
+C:\mainFolder\03_study\002_ASP_NET\AWS_WEBAPP\AWS_NET_CORE\CloudNativeWebSolution\CloudNativeWeb\bin\Debug\netcoreapp3.1\AWSSDK.DynamoDBv2.dll

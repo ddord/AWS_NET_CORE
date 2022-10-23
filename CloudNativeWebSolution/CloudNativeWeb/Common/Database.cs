@@ -12,7 +12,7 @@ namespace CloudNativeWeb.Common
 {
     public class Database
     {
-        string ConnectionString = CommonHelper.GetRDSConnectionString();
+        string ConnectionString = CloudHelper.GetRDSConnectionString();
 
         public IEnumerable ExecuteQuery(string query, object param = null, CommandType? commandType = null, DbTransaction transaction = null, int? commandTimeout = null)
         {

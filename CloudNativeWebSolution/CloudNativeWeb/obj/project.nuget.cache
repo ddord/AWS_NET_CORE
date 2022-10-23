@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "1r3ptjeI0vo7RkQREQFgPH0FWfQjvTVyK8E1ltrzFHiNT473Gw+lbhNZJiN6RxlOYlX5iESvkx/Ql9vwxfnd6w==",
+  "dgSpecHash": "0hGwXp/DpY0Q1O8MjcWKuyyBHwV6bUa1P9FmslhXl1+jwo6R2V9tEMUi4mMZ5gpP/Oq254gdCeoLv+q+/bdmQA==",
   "success": true,
   "projectFilePath": "C:\\mainFolder\\03_study\\002_ASP_NET\\AWS_WEBAPP\\AWS_NET_CORE\\CloudNativeWebSolution\\CloudNativeWeb\\CloudNativeWeb.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\mediworks01\\.nuget\\packages\\awssdk.core\\3.7.13.21\\awssdk.core.3.7.13.21.nupkg.sha512",
+    "C:\\Users\\mediworks01\\.nuget\\packages\\awssdk.core\\3.7.100\\awssdk.core.3.7.100.nupkg.sha512",
+    "C:\\Users\\mediworks01\\.nuget\\packages\\awssdk.dynamodbv2\\3.7.100\\awssdk.dynamodbv2.3.7.100.nupkg.sha512",
     "C:\\Users\\mediworks01\\.nuget\\packages\\awssdk.s3\\3.7.9.70\\awssdk.s3.3.7.9.70.nupkg.sha512",
     "C:\\Users\\mediworks01\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\mediworks01\\.nuget\\packages\\microsoft.extensions.configuration\\6.0.0\\microsoft.extensions.configuration.6.0.0.nupkg.sha512",

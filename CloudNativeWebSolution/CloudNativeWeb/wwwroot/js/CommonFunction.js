@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-    m_Date.Picker();
     $('#menuList').find('a').each(function () {
         if ($(this).attr('href').toLowerCase() == window.location.pathname.toLowerCase()) {
             $(this).closest('div').addClass("selected");
