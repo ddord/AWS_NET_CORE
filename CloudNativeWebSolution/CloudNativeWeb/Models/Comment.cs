@@ -6,23 +6,21 @@ using System.Threading.Tasks;
 
 namespace CloudNativeWeb.Models
 {
-    public class Movie
+    public class Comment
     {
         [DynamoDBProperty("pk")]
-        [DynamoDBHashKey("title")]
+        [DynamoDBHashKey("commentId")]
+        public string CommentId { get; set; }
+
+        [DynamoDBRangeKey("sk")]
+        [DynamoDBProperty("title")]
         public string Title { get; set; }
 
-        [DynamoDBProperty("genre")]
-        public string Genre { get; set; }
-
-        [DynamoDBProperty("releaseTime")]
-        public string ReleaseTime { get; set; }
-
-        [DynamoDBProperty("director")]
-        public string Director { get; set; }
+        [DynamoDBProperty("commentContent")]
+        public string CommentContent { get; set; }
 
         [DynamoDBProperty("rating")]
-        public double Rating { get; set; }
+        public float Rating { get; set; }
 
         [DynamoDBProperty("updateDate")]
         public string UpdateDate { get; set; }

@@ -187,6 +187,87 @@ var m_Ajax = {
     }
 }
 
+var m_Required = {
+    Check: function () {
+        var isAccept = true;
+
+        if ($('[m_required]').length > 0) {
+            var msg = "";
+
+            $('[m_required]').each(function () {
+                var keyword = $(this).attr('m_required');
+                var value = "";
+                var isInputHidden = false;
+
+                if (keyword != "") {
+                    switch ($(this).prop('tagName').toLowerCase()) {
+                        case "textarea":
+                            msg = "Please enter {0}.";
+                            value = $(this).val();
+                            break;
+                        case "select":
+                            msg = "Please select {0}.";
+                            value = $(this).val();
+                            break;
+                        case "input":
+                            switch ($(this).attr('type')) {
+                                case "text":
+                                case "password":
+                                    msg = "Please enter {0}.";
+                                    value = $(this).val();
+                                    break;
+                                case "hidden":
+                                    msg = "Please enter {0}.";
+                                    value = $(this).val();
+                                    isInputHidden = true;
+                                    break;
+                                case "checkbox":
+                                case "radio":
+                                    msg = "Please select {0}.";
+                                    var checkedCnt = 0;
+                                    $("[m_required=" + $(this).attr('m_required') + "]").each(function () {
+                                        if ($(this).is(":checked")) {
+                                            checkedCnt++;
+                                        }
+                                    });
+
+                                    if (checkedCnt > 0) {
+                                        value = true;
+                                    } else {
+                                        value = false;
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
+                }
+
+                if (isInputHidden) {
+                    if (value == false || value == "" || value == null || value == -1) {
+                        if (value != '0') {
+                            msg = msg.replace("{0}", keyword);
+                            alert(msg);
+                            isAccept = false;
+                            return false;
+                        }
+                    }
+                } else {
+                    if (value == false || value == "" || value == null || value == -1) {
+                        if (value != '0') {
+                            msg = msg.replace("{0}", keyword);
+                            alert(msg);
+                            isAccept = false;
+                            return false;
+                        }
+                    }
+                }
+            });
+        }
+
+        return isAccept;
+    }
+}
+
 var m_Upload = {
     File: function (fileform, url, callbackName) {
         $.ajax({

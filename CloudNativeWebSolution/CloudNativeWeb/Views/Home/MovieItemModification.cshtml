@@ -5,239 +5,211 @@
 @section Scripts {
     <script>
         var currentId = "@ViewBag.CurrentId";
+        var userDPName = "@CloudNativeWeb.Common.UserInfo.Current.DisplayName";
 
         function fnDocumentReadyCommon() {
-            m_CurrentService = "Announcements";
-
-            fnRegionFill();
-            fnSelectAnnouncementsList();
-
-            m_Editor.Set($("#txtEditor"), $("#txtTempFile"));
-            m_Editor.Set($("#txtEditor_Eng"), $("#txtTempFile_Eng"));
-
-            m_KorEditor = $("#txtEditor").data("kendoEditor");
-            m_EngEditor = $("#txtEditor_Eng").data("kendoEditor");
+            selectMovieItem();
+            selectCommentList();
         }
 
-        function fnChangeTab(elem) {
-            var language = $(elem).attr('id').replace("tab", "");
-
-            $(elem).closest('ul').find('li').removeClass("active");
-            $(elem).closest('ul').find('#tab' + language).addClass("active");
-
-            $('#inputField').children('div').hide();
-            $('#inputField').find('#tbl' + language).show();
-        }
-
-        function fnSelectAnnouncementsList() {
+        function selectMovieItem() {
 
             var param = {
-                indexNumber: currentId
+                title: currentId
             }
 
-            m_Ajax.Call('@Url.Action("SelectAnnouncementsItem")', param, function (data) {
-                $('#txtTitle').val(data[0].Title);
-                $('#txtUrl').val(data[0].txtUrl);
-                $('#txtCreateDate').val(data[0].CreateDate);
-                m_KorEditor.value(data[0].Content);
-                if (data[0].IsIntraNet == 1) {
-                    $('#chkIsIntraNet').prop("checked", true);
-                }
-                if (data[0].IsActive == 1) {
-                    $('#chkIsActive').prop("checked", true);
-                }
-                $('#txtUrl').val(data[0].Url);
-                $('#txtTitle_Eng').val(data[0].Title_Eng);
-                m_EngEditor.value(data[0].Content_Eng);
-
-                $('#txtUrl_Eng').val(data[0].Url_Eng);
-                $('#txtDisplayBegin').val(data[0].DisplayBegin);
-                $('#txtDisplayEnd').val(data[0].DisplayEnd);
-
-                if (data[0].RegionName) {
-                    regionNames = data[0].RegionName;
-                    regionName = [regionNames.split('|')];
-                    regionName = regionName[0];
-
-                    for (var RegionName in regionName) {
-                        $("input:checkbox[name='region']:checkbox[value='" + regionName[RegionName] + "'" + "]").prop("checked", true);
-                    }
-                }
-
-                if ($('#region_table_tbody input[type=checkbox]:checked').length == $('#region_table_tbody  input[type=checkbox]').length - 1) {
-                    $('#chkAll').prop('checked', true);
+            m_Ajax.Call('@Url.Action("SelectMovieItem")', param, function (data) {
+                if (data) {
+                    $('#txtTitle').val(data[0].title);
+                    $('#selectGenre').val(data[0].genre);
+                    $('#txtDirector').val(data[0].director);
+                    $('#txtReleaseTime').val(data[0].releaseTime);
                 }
             });
         }
 
-        function fnUpdateAnnouncements() {
+        function updateMovieItem() {
             if (!m_Required.Check()) {
                 return;
             }
 
-            if ($("#region_table_tbody input[type=checkbox]:checked").length == 0) {
-                alert("지역을 설정하시기 바랍니다.");
+            if ($("#txtTitle").val().trim() == "") {
+                alert("Please enter the title.");
                 return;
             }
-            if ($("#txtEditor").val() == "") {
-                alert("내용(한글)이 비어있습니다.");
-                return;
-            }
-            var regiong_list = []
-            $("#region_table").find("input[type=checkbox]:checked").each(function () {
-                if ($(this).attr('id') != 'chkAll') {
-
-                    regiong_list.push({ IndexNumber: currentId, RegionName: $(this).val() });
-                }
-            });
 
             var updateParam = {
-                tempId: currentId,
-                model: {
-                    Title: $('#txtTitle').val(),
-                    Url: $('#txtUrl').val(),
-                    IsIntraNet: $("#chkIsIntraNet").is(":checked"),
-                    UpdateUser: "@CloudNativeWeb.Common.UserInfo.Current.ID",
-                    UpdateUserName: "@CloudNativeWeb.Common.UserInfo.Current.DisplayName",
-                    Content: m_KorEditor.value(),
-                    Title_Eng: $('#txtTitle_Eng').val(),
-                    Content_Eng: m_EngEditor.value(),
-                    IsActive: $("#chkIsActive").is(":checked"),
-                    Url_Eng: $('#txtUrl_Eng').val(),
-                    DisplayBegin: $('#txtDisplayBegin').val(),
-                    DisplayEnd: $('#txtDisplayEnd').val()
-                },
-                regionParam: regiong_list
+                title: $('#txtTitle').val().trim(),
+                genre: $('#selectGenre').val(),
+                director: $('#txtDirector').val().trim(),
+                releaseTime: $('#txtReleaseTime').val().trim()
             }
 
-            m_Ajax.Call('@Url.Action("UpdateAnnouncements")', updateParam, function (data) {
+            m_Ajax.Call('@Url.Action("UpdateMovieItem")', updateParam, function (data) {
                 if (data > 0) {
-                    alert("저장했습니다.");
-                    opener.fnDocumentReadyCommon()
+                    alert("Save.");
+                    opener.fnDocumentReadyCommon();
                     m_Popup.Close();
                 } else {
-                    alert("오류가 발생하였습니다. 잠시만 기다려주세요.");
+                    alert("Error: Please check for duplicate titles or other data");
                 }
             });
         }
 
-        function fnCheckItem(chkThis) {
-            var chklbl = $(chkThis).closest('label');
-            var chkItem = $(chkThis);
-            if (chklbl.text() == "All" && chkItem.is(':checked') == true) {
-                $(chklbl).closest('tbody').find("[type=checkbox]").prop("checked", true);
-            } else if (chklbl.text() == "All" && chkItem.is(':checked') == false) {
-                $(chkThis).closest('tbody').find("[type=checkbox]").prop("checked", false);
-            } else if (chklbl.text() != "All" && chkItem.is(':checked') == false) {
-                $("#chkAll").prop("checked", false);
+        function selectCommentList() {
+            var param = {
+                title: $('#txtTitle').val().trim()
             }
 
-            var allCnt = $(chkThis).closest('tbody').find('[type=checkbox]').length - 1;
-            var checkedCnt = 0;
-
-            $(chkThis).closest('tbody').find('[type=checkbox]').each(function () {
-                if ($(this).closest('label') != "All") {
-                    if ($(this).is(':checked')) {
-                        checkedCnt++;
-                    }
-                }
-            });
-
-            if (allCnt == checkedCnt) {
-                $("#chkAll").prop("checked", true);
-            }
-        }
-
-        function fnRegionFill() {
-            var param = { }
-            m_Ajax.Call('@Url.Action("SelectRegionList")', param, function (data) {
-                if (data.length  > 0) {
-
-                    var item_cnt = 0;
-                    var td_html = "";
-                    var changeHtml = $('#region_table #region_table_tbody').html();
-
-                    td_html += '<tr><td style="border: 0;"><label><input type="checkbox" id="chkAll" value="All" onclick="fnCheckItem(this);">All</label></td></tr>';
-
+            m_Ajax.Call('@Url.Action("SelectCommentList")', param, function (data) {
+                if (data) {
+                    var tbodyHtml = "";
                     $(data).each(function (i) {
-                        item_cnt += 1
-                        td_html += '<td style="border: 0;"><label><input type="checkbox" name="region" value="' + data[i].RegionName + '" onclick="fnCheckItem(this);">' + data[i].RegionName + '</label></td>';
-                        if (item_cnt == 4) {
-                            td_html = '<tr>' + td_html + '<tr>';
-                            changeHtml += td_html;
-                            td_html = "";
-                            item_cnt = 0;
+                        tbodyHtml += '<tr>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].updateUser ? data[i].updateUser : "") + '<input type="hidden" id="hidCommentId_' + data[i].commentId + '" /></td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].commentContent ? data[i].commentContent : "") + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].rating ? data[i].rating.toString() + "/10" : "0/10") + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5) + '</td>';
+                        const d1 = new Date(data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5));
+                        const d2 = new Date();
+                        d2.setDate(d2.getDate() - 1);
+                        if (userDPName == data[i].updateUser && d2.getTime() < d1.getTime()) {
+                            tbodyHtml += '  <td class="align-center"><button class="btn-round sub-btn btn-gray" onclick="editComment(this)"><i class="icon-fux-write"></i></button></td >';
+                        } else {
+                            tbodyHtml += '  <td></td>';
                         }
+
+                        tbodyHtml += '</tr>';
                     });
+                    $('#commentList').html(tbodyHtml);
 
-                    if (td_html != "") {
-                        td_html = '<tr>' + td_html + '<tr>';
-                        changeHtml += td_html;
-                        td_html = "";
-                    }
-
-                    $('#region_table #region_table_tbody').html(changeHtml);
-                } else {
-                    alert("조회 결과가 없습니다.");
+                    $('#commentCount').text(data.length + " Comments");
                 }
-            })
+            });
         }
 
-        function fnSetIsActive() {
-            var flag = false;
-            if ($('#chkIsActive').is(':checked')) {
-                if (confirm("공지가 메인화면에 노출됩니다. 계속 진행하시겠습니까 ?")) {
-                    flag = true;
-                } else {
-                    $('#chkIsActive').prop('checked', false);
-                    return;
-                }
-            }
-            else {
-                if (confirm("공지가 메인화면에 노출되지 않습니다. 계속 진행하시겠습니까 ?")) {
-                    flag = false;
-                } else {
-                    $('#chkIsActive').prop('checked', true);
-                    return;
-                }
-            }
+        function insertComment(elem) {
+            var clickRow = $(elem).closest('tr');
+            var td = clickRow.children();
 
             var param = {
-                indexNumber: currentId,
-                isActive: flag,
-                page: "Announcements"
-            }
-            m_Ajax.Call('@Url.Action("UpdateActive")', param, function (data) {
-                if (data > 0) {
-                    alert("공지 노출 설정이 변경되었습니다.");
-                    opener.fnDocumentReadyCommon()
+                updateUser: userDPName,
+                title: $('#txtTitle').val().trim(),
+                commentContent: $('#txtCommentContent').val().trim(),
+                rating: $('#selectRating').val()
+            };
+
+            m_Ajax.Call('@Url.Action("InsertComment")', param, function (data) {
+                if (data) {
+                    //var tbodyHtml = "";
+                    //$(data).each(function (i) {
+                    //    tbodyHtml += '<tr>';
+                    //    tbodyHtml += '  <td class="align-center">' + (data[i].updateUser ? data[i].updateUser : "") + '<input type="hidden" id="hidCommentId_' + data[i].commentId + ' /></td>';
+                    //    tbodyHtml += '  <td class="align-center">' + (data[i].comment ? data[i].comment : "") + '</td>';
+                    //    tbodyHtml += '  <td class="align-center">' + (data[i].rating ? data[i].rating.toString() + "/10" : "0/10") + '</td>';
+                    //    tbodyHtml += '  <td class="align-center">' + data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5) + '</td>';
+                    //    const d1 = new Date(data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5));
+                    //    const d2 = new Date();
+                    //    d2.setDate(d2.getDate() - 1);
+                    //    if (userDPName == data[i].updateUser && d2.getTime() < d1.getTime()) {
+                    //        tbodyHtml += '  <td class="align-center"><button class="btn-round sub-btn btn-gray" onclick="editComment(this)"><i class="icon-fux-write"></i></button></td >';
+                    //    } else {
+                    //        tbodyHtml += '  <td></td>';
+                    //    }
+
+                    //    tbodyHtml += '</tr>';
+                    //});
+                    //$('#commentList').html(tbodyHtml);
+
+                    alert("Save.");
+                    opener.fnDocumentReadyCommon();
                 } else {
-                    alert("공지 노출 변경이 실패했습니다.");
-                    if (flag) {
-                        $('#chkIsActive').prop('checked', false);
-                    } else {
-                        $('#chkIsActive').prop('checked', true);
-                    }
+                    alert("Error: Please check for duplicate titles or other data");
                 }
-            })
+            });
         }
 
-        function fnDelete() {
-            if (confirm("삭제 하시겠습니까?")) {
-                var params = {
-                    indexNumber: currentId
-                };
+        function editComment(elem) {
+            var clickRow = $(elem).closest('tr');
+            var td = clickRow.children();
 
-                m_Ajax.Call('@Url.Action("DeleteAnnouncements")', params, function (data) {
-                    opener.fnDocumentReadyCommon();
-                    if (data) {
-                        alert("삭제했습니다.");
-                        m_Popup.Close();
+            td.each(function (i) {
+                if (i == 0 || i == 3) {
+                } else if (i == 4) {
+                    var changeHtml = "";
+                    changeHtml += '       <button class="btn-round sub-btn btn-gray" onclick="editCommentOk(this)"><i class="icon-fux-check-mark"></i></button>';
+                    changeHtml += '       <button class="btn-round sub-btn btn-gray" onclick="editCommentCancel(this)"><i class="icon-fux-close"></i></button>';
+                    td.eq(i)[0].innerHTML = changeHtml;
+                } else if (i == 2)  {
+                    var choiceTxt = td.eq(i).text().trim();
+                    choiceTxt = choiceTxt.replace('/10', '');
+                    td.eq(i)[0].outerHTML = '<td class="align-center"><input type="text" class="fm-def" style="width: 100%;" value="' + choiceTxt + '" /></td>';
+                    $(td.eq(i).children()).val(choiceTxt);
+                } else {
+                    var choiceTxt = td.eq(i).text().trim();
+                    td.eq(i)[0].outerHTML = '<td class="align-center"><input type="text" class="fm-def" style="width: 100%;" value="' + choiceTxt + '" /></td>';
+                    $(td.eq(i).children()).val(choiceTxt);
+                }
+            });
+        }
+
+        function editCommentOk(elem) {
+            var clickRow = $(elem).closest('tr');
+            var td = clickRow.children();
+
+            var getCommentId = $($(td[0]).find("[id*=hidCommentId_]")).attr('id').replace('hidCommentId_', '');
+            var getRating = $(td[2]).text().replace('/10', '');
+            var param = {
+                updateUser: userDPName,
+                title: $('#txtTitle').val().trim(),
+                commentId: getCommentId,
+                commentContent: $(td[1]).children(0).val().trim(),
+                rating: getRating
+            };
+
+            m_Ajax.Call('@Url.Action("UpdateCommentItem")', param, function (data) {
+                if (data == null)
+                    alert("Error: Please check for data");
+                else if (data && data.d && data.d.length > 0) {
+
+                    td.eq(1)[0].innerHTML = (data[0].comment ? data[0].comment : "");
+                    td.eq(2)[0].innerHTML = (data[0].rating ? data[0].rating.toString() + "/10" : "0/10");
+                    td.eq(3)[0].innerHTML = data[0].updateDate.split('T')[0] + ' ' + data[0].updateDate.split('T')[1].substring(0, 5);
+
+                    td.eq(1)[0].outerHTML = '<td class="align-center">' + td.eq(4)[0].innerHTML.replace(/<(input)([^>]*)>/gi, "") + '</td>';
+                    td.eq(2)[0].outerHTML = '<td class="align-center">' + td.eq(5)[0].innerHTML.replace(/<(input)([^>]*)>/gi, "") + '</td>';
+
+                    const d1 = new Date(data[0].updateDate.split('T')[0] + ' ' + data[0].updateDate.split('T')[1].substring(0, 5));
+                    const d2 = new Date();
+                    d2.setDate(d2.getDate() - 1);
+                    if (userDPName == data[i].updateUser && d2.getTime() < d1.getTime()) {
+                        tbodyHtml += '  <td class="align-center"><button class="btn-round sub-btn btn-gray" onclick="editComment(this)"><i class="icon-fux-write"></i></button></td >';
                     } else {
-                        alert("오류가 발생하였습니다. 잠시만 기다려주세요.");
+                        tbodyHtml += '  <td></td>';
                     }
-                });
+                    alert("Update");
+                } else {
+                    alert("Error: Please check for data");
+                }
+            });
+        }
+
+        function editCommentCancel(elem) {
+            var clickRow = $(elem).closest('tr');
+            var td = clickRow.children();
+
+            td.eq(1)[0].outerHTML = '<td class="align-center">' + $(td[1]).children(0)[0].defaultValue + '</td>';
+            td.eq(3)[0].outerHTML = '<td class="align-center">' + $(td[3]).children(0)[0].defaultValue + '</td>';
+
+            const d1 = new Date(td.eq(3).innerHTML);
+            const d2 = new Date();
+            d2.setDate(d2.getDate() - 1);
+            var changeHtml = "";
+            if (userDPName == data[i].updateUser && d2.getTime() < d1.getTime()) {
+                changeHtml = '  <td class="align-center"><button class="btn-round sub-btn btn-gray" onclick="editComment(this)"><i class="icon-fux-write"></i></button></td >';
             }
+
+            td.eq(4)[0].innerHTML = changeHtml;
         }
     </script>
 }
@@ -261,38 +233,45 @@
                     </colgroup>
                     <tbody>
                         <tr>
-                            <th>활성화</th>
+                            <th>Title</th>
                             <td>
-                                <input type="checkbox" id="chkIsActive" onchange="fnSetIsActive()" />
+                                <input id="txtTitle" type="text" class="fm-def" style="width: 200px;" m_required="Title" readonly />
                             </td>
-                            <th>로그인 전용</th>
+                            <th>Genre</th>
                             <td>
-                                <input type="checkbox" id="chkIsIntraNet" />
+                                <select id="selectGenre" class="fm-def" style="width:120px;">
+                                    <option value="Action">Action</option>
+                                    <option value="Animation">Animation</option>
+                                    <option value="Comedy">Comedy</option>
+                                    <option value="Crime">Crime</option>
+                                    <option value="Drama">Drama</option>
+                                    <option value="Experimental">Experimental</option>
+                                    <option value="Fantasy">Fantasy</option>
+                                    <option value="Historical">Historical</option>
+                                    <option value="Horror">Horror</option>
+                                    <option value="Romance">Romance</option>
+                                    <option value="Science Fiction">Science Fiction</option>
+                                    <option value="Thriller">Thriller</option>
+                                    <option value="Western">Western</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </td>
                         </tr>
                         <tr>
-                            <th>시작일</th>
+                            <th>Director</th>
                             <td>
-                                <input id="txtDisplayBegin" type="text" style="width: 200px; " m_datepicker m_required="시작일" />
+                                <input id="txtDirector" type="text" class="fm-def" style="width: 200px;" m_required="Director" />
                             </td>
-                            <th>종료일</th>
+                            <th>Release Time</th>
                             <td>
-                                <input id="txtDisplayEnd" type="text" style="width: 200px;" m_datepicker m_required="종료일" />
+                                <input id="txtReleaseTime" type="text" class="fm-def" style="width: 200px;" m_required="ReleaseTime" />
                             </td>
                         </tr>
                         <tr>
-                            <th>공지 지역선택<span class="required">*</span></th>
+                            <th>Movie File</th>
                             <td colspan="3">
-                                <table id="region_table">
-                                    <colgroup>
-                                        <col width="150" />
-                                        <col width="150" />
-                                        <col width="150" />
-                                        <col width="150" />
-                                    </colgroup>
-                                    <tbody id="region_table_tbody">
-                                    </tbody>
-                                </table>
+                                <input id="txtTempFile_Eng" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'en');" style="display:none;" />
+                                <input id="movieUpload" type="file" class="fm-def" style="width: 100%;" />
                             </td>
                         </tr>
                     </tbody>
@@ -302,84 +281,63 @@
             <div class="space-m"></div>
 
             <div class="subpage-body">
-
-                <ul class="nav nav-tabs">
-                    <li id="tabKor" class="tablink active" onclick="fnChangeTab(this);"><a>한글</a></li>
-                    <li id="tabEng" class="tablink" onclick="fnChangeTab(this);"><a>영어</a></li>
-                </ul>
-
-                <div id="inputField" class="tab-content flex-1 overflow-auto-y p-t-l">
-
-                    <div id="tblKor">
-                        <table width="100%" class="tbl-basic">
-                            <colgroup>
-                                <col width="12%" />
-                                <col width="18%" />
-                                <col width="12%" />
-                                <col width="26%" />
-                                <col width="12%" />
-                                <col width="20%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <th>제목<span class="required">*</span></th>
-                                    <td colspan="5">
-                                        <input id="txtTitle" type="text" class="fm-def" style="width: 100%;" m_required="제목" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>URL</th>
-                                    <td colspan="5">
-                                        <input id="txtUrl" type="text" class="fm-def" style="width: 100%;" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <textarea id="txtEditor" aria-label="editor" style="height:600px;"></textarea>
-                        <input id="txtTempFile" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'ko');" style="display:none;" />
+                <div id="ipAddress_div" class="grd-wrap">
+                    <div class="space-m"></div>
+                    <div class="dp-flex">
+                        <div class="mr-auto">
+                            <h6 class="ft-blue">Comment</h6>
+                        </div>
                     </div>
-
-                    <div id="tblEng" style="display:none;">
-
-                        <table width="100%" class="tbl-basic">
-                            <colgroup>
-                                <col width="12%" />
-                                <col width="18%" />
-                                <col width="12%" />
-                                <col width="26%" />
-                                <col width="12%" />
-                                <col width="20%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <th>제목<span class="required">*</span></th>
-                                    <td colspan="5">
-                                        <input id="txtTitle_Eng" type="text" class="fm-def" style="width: 100%;" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>URL</th>
-                                    <td colspan="5">
-                                        <input id="txtUrl_Eng" type="text" class="fm-def" style="width: 100%;" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <textarea id="txtEditor_Eng" aria-label="editor" style="height:600px;"></textarea>
-                        <input id="txtTempFile_Eng" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'en');" style="display:none;" />
-                    </div>
-
+                    <div class="dp-flex">
+                        <div class="mr-auto">
+                            <div style="float: left;">
+                                <select id="selectRating" class="fm-def" style="width:120px;">
+                                    <option value="10" selected>10</option>
+                                    <option value="9">9</option>
+                                    <option value="8">8</option>
+                                    <option value="7">7</option>
+                                    <option value="6">6</option>
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                    <option value="0">0</option>
+                                </select>
+                            </div>
+                            <div style="float: right;">
+                                <input id="txtCommentContent" type="text" class="fm-def" style="width: 700px" placeholder="Enter comment.." />
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <button onclick="insertComment();" class="btn sub-btn btn-basic-outline">Write</button>
+                        </div>
+                        </div>
+                    <div class="space-s"></div>
+                    <table width="100%" class="grd">
+                        <colgroup>
+                            <col width="15%">
+                            <col>
+                            <col width="10%">
+                            <col width="15%">
+                            <col width="10%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th colspan="5" id="commentCount"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="commentList">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <div class="pop-footer">
             <div class="dp-flex">
-                <div>
-                    <button class="btn page-btn btn-basic" id="btnDelete" onclick="fnDelete();">삭제</button>
-                </div>
                 <div class="ml-auto">
-                    <button class="btn page-btn btn-basic" onclick="fnUpdateAnnouncements();">저장</button>
+                    <button class="btn page-btn btn-basic" onclick="updateMovieItem();">저장</button>
                     <button class="btn page-btn btn-basic" onclick="m_Popup.Close();">취소</button>
                 </div>
             </div>

@@ -45,6 +45,18 @@ namespace CloudNativeWeb.Controllers
             return View();
         }
 
+        public IActionResult MovieItemRegistration([FromQuery] string title)
+        {
+            ViewBag.CurrentId = title;
+            return View();
+        }
+
+        public IActionResult MovieItemModification([FromQuery] string title)
+        {
+            ViewBag.CurrentId = title;
+            return View();
+        }
+
         public IActionResult LoginProcess(string id, string password, string returnUrl)
         {
             ClaimsIdentity identity = null;
@@ -63,7 +75,7 @@ namespace CloudNativeWeb.Controllers
             }
             else
             {
-                var adminUserList = _commonService.SelectAdminUser(id);
+                var adminUserList = _commonService.SelectAdminUser(id, password);
                 List<object> list = (List<object>)adminUserList;
                 if (list.Count == 0)
                 {
@@ -111,12 +123,48 @@ namespace CloudNativeWeb.Controllers
             return Json(result);
         }
 
-        public async Task<IActionResult> SelectMovieList(int rating, string genre, string title)
+        public async Task<IActionResult> SelectMovieList(double rating, string genre, string title)
         {
             var result = await _commonService.SelectMovieList(rating, genre, title);
             return Json(result);
         }
 
+        public async Task<IActionResult> SelectMovieItem(string title)
+        {
+            var result = await _commonService.SelectMovieItem(title);
+            return Json(result);
+        }
+
+        public async Task<IActionResult> InsertMovieItem(Movie models)
+        {
+            var result = await _commonService.InsertMovieItem(models);
+            return Json(result);
+        }
+        
+        public async Task<IActionResult> UpdateMovieItem(Movie models)
+        {
+            var result = await _commonService.UpdateMovieItem(models);
+            return Json(result);
+        }
+
+        public async Task<IActionResult> SelectCommentList(string title)
+        {
+            var result = await _commonService.SelectCommentList(title);
+            return Json(result);
+        }
+        
+        public async Task<IActionResult> InsertComment(Comment models)
+        {
+            models.CommentId = Convert.ToString(Guid.NewGuid());
+            var result = await _commonService.InsertComment(models);
+            return Json(result);
+        }
+
+        public async Task<IActionResult> Updatecomment(Comment models)
+        {
+            var result = await _commonService.UpdateComment(models);
+            return Json(result);
+        }
 
     }
 }

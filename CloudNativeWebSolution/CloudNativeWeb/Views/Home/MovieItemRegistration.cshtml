@@ -4,141 +4,39 @@
 }
 @section Scripts {
     <script>
-        var currentId = "@ViewBag.Guid";
+        var currentId = "@ViewBag.CurrentId";
 
         function fnDocumentReadyCommon() {
-            m_CurrentService = "Announcements";
-            fnRegionFill();
-
-            m_Editor.Set($("#txtEditor"), $("#txtTempFile"));
-            m_Editor.Set($("#txtEditor_Eng"), $("#txtTempFile_Eng"));
-            m_KorEditor = $("#txtEditor").data("kendoEditor");
-            m_EngEditor = $("#txtEditor_Eng").data("kendoEditor");
         }
 
-        function fnChangeTab(elem) {
-            var language = $(elem).attr('id').replace("tab", "");
-
-            $(elem).closest('ul').find('li').removeClass("active");
-            $(elem).closest('ul').find('#tab' + language).addClass("active");
-
-            $('#inputField').children('div').hide();
-            $('#inputField').find('#tbl' + language).show();
-        }
-
-        function fnInsertAnnouncements() {
+        function insertMovieItem() {
             if (!m_Required.Check()) {
                 return;
             }
 
-            if ($("#region_table_tbody input[type=checkbox]:checked").length == 0) {
-                alert("지역을 설정하시기 바랍니다.");
+            if ($("#txtTitle").val().trim() == "") {
+                alert("Please enter the title.");
                 return;
             }
-            if ($("#txtEditor").val() == "") {
-                alert("내용(한글)이 비어있습니다.");
-                return;
-            }
-            var regiong_list = []
-
-            $("#region_table").find("input[type=checkbox]:checked").each(function () {
-                if ($(this).attr('id') != 'chkAll') {
-                    regiong_list.push({ IndexNumber: 0, RegionName: $(this).val() });
-                }
-            });
 
             var insertParam = {
-                tempId: currentId,
-                model: {
-                    Title: $('#txtTitle').val(),
-                    Url: $('#txtUrl').val(),
-                    IsIntraNet: $("#chkIsIntraNet").is(":checked"),
-                    UpdateUser: "@CloudNativeWeb.Common.UserInfo.Current.ID",
-                    UpdateUserName: "@CloudNativeWeb.Common.UserInfo.Current.DisplayName",
-                    Content: m_KorEditor.value(),
-                    Title_Eng: $('#txtTitle_Eng').val(),
-                    Content_Eng: m_EngEditor.value(),
-                    IsActive: $("#chkIsActive").is(":checked"),
-                    Url_Eng: $('#txtUrl_Eng').val(),
-                    DisplayBegin: $('#txtDisplayBegin').val(),
-                    DisplayEnd: $('#txtDisplayEnd').val()
-                },
-                regionParam: regiong_list
+                title: $('#txtTitle').val().trim(),
+                genre: $('#selectGenre').val(),
+                director: $('#txtDirector').val().trim(),
+                releaseTime: $('#txtReleaseTime').val().trim()
             }
 
-            m_Ajax.Call('@Url.Action("InsertAnnouncements")', insertParam, function (data) {
+            m_Ajax.Call('@Url.Action("InsertMovieItem")', insertParam, function (data) {
                 if (data > 0) {
-                    alert("저장했습니다.");
+                    alert("Save.");
                     opener.fnDocumentReadyCommon()
                     m_Popup.Close();
                 } else {
-                    alert("오류가 발생하였습니다. 잠시만 기다려주세요.");
+                    alert("Error: Please check for duplicate titles or other data");
                 }
             });
         }
 
-        function fnCheckItem(chkThis) {
-            var chklbl = $(chkThis).closest('label');
-            var chkItem = $(chkThis);
-            if (chklbl.text() == "All" && chkItem.is(':checked') == true) {
-                $(chklbl).closest('tbody').find("[type=checkbox]").prop("checked", true);
-            } else if (chklbl.text() == "All" && chkItem.is(':checked') == false) {
-                $(chkThis).closest('tbody').find("[type=checkbox]").prop("checked", false);
-            } else if (chklbl.text() != "All" && chkItem.is(':checked') == false) {
-                $("#chkAll").prop("checked", false);
-            }
-
-            var allCnt = $(chkThis).closest('tbody').find('[type=checkbox]').length - 1;
-            var checkedCnt = 0;
-
-            $(chkThis).closest('tbody').find('[type=checkbox]').each(function () {
-                if ($(this).closest('label') != "All") {
-                    if ($(this).is(':checked')) {
-                        checkedCnt++;
-                    }
-                }
-            });
-
-            if (allCnt == checkedCnt) {
-                $("#chkAll").prop("checked", true);
-            }
-        }
-
-        function fnRegionFill() {
-            var param = { }
-            m_Ajax.Call('@Url.Action("SelectRegionList")', param, function (data) {
-                if (data.length  > 0) {
-
-                    var item_cnt = 0;
-                    var td_html = "";
-                    var changeHtml = $('#region_table #region_table_tbody').html();
-
-                    td_html += '<tr><td style="border: 0;"><label><input type="checkbox" id="chkAll" value="All" onclick="fnCheckItem(this);">All</label></td></tr>';
-
-                    $(data).each(function (i) {
-                        item_cnt += 1
-                        td_html += '<td style="border: 0;"><label><input type="checkbox" name="region" value="' + data[i].RegionName + '" onclick="fnCheckItem(this);">' + data[i].RegionName + '</label></td>';
-                        if (item_cnt == 4) {
-                            td_html = '<tr>' + td_html + '<tr>';
-                            changeHtml += td_html
-                            td_html = ""
-                            item_cnt = 0
-                        }
-                    });
-
-                    if (td_html != "") {
-                        td_html = '<tr>' + td_html + '<tr>';
-                        changeHtml += td_html
-                        td_html = ""
-                    }
-
-                    $('#region_table #region_table_tbody').html(changeHtml);
-                    $('#region_table #region_table_tbody').find("[type=checkbox]").prop("checked", true);
-                } else {
-                    alert("조회 결과가 없습니다.");
-                }
-            })
-        }
     </script>
 }
 <div>
@@ -161,38 +59,38 @@
                     </colgroup>
                     <tbody>
                         <tr>
-                            <th>활성화</th>
+                            <th>Title</th>
                             <td>
-                                <input type="checkbox" id="chkIsActive" />
+                                <input id="txtTitle" type="text" class="fm-def" style="width: 200px;" m_required="Title" />
                             </td>
-                            <th>로그인 전용</th>
+                            <th>Genre</th>
                             <td>
-                                <input type="checkbox" id="chkIsIntraNet" />
+                                <select id="selectGenre" class="fm-def" style="width:120px;">
+                                    <option value="Action">Action</option>
+                                    <option value="Animation">Animation</option>
+                                    <option value="Comedy">Comedy</option>
+                                    <option value="Crime">Crime</option>
+                                    <option value="Drama">Drama</option>
+                                    <option value="Experimental">Experimental</option>
+                                    <option value="Fantasy">Fantasy</option>
+                                    <option value="Historical">Historical</option>
+                                    <option value="Horror">Horror</option>
+                                    <option value="Romance">Romance</option>
+                                    <option value="Science Fiction">Science Fiction</option>
+                                    <option value="Thriller">Thriller</option>
+                                    <option value="Western">Western</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </td>
                         </tr>
                         <tr>
-                            <th>시작일</th>
+                            <th>Director</th>
                             <td>
-                                <input id="txtDisplayBegin" type="text" style="width: 200px; " m_datepicker m_required="시작일" />
+                                <input id="txtDirector" type="text" class="fm-def" style="width: 200px;" m_required="Director" />
                             </td>
-                            <th>종료일</th>
+                            <th>Release Time</th>
                             <td>
-                                <input id="txtDisplayEnd" type="text" style="width: 200px;" m_datepicker m_Year="1" m_required="종료일" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>공지 지역선택<span class="required">*</span></th>
-                            <td colspan="3">
-                                <table id="region_table">
-                                    <colgroup>
-                                        <col width="150" />
-                                        <col width="150" />
-                                        <col width="150" />
-                                        <col width="150" />
-                                    </colgroup>
-                                    <tbody id="region_table_tbody">
-                                    </tbody>
-                                </table>
+                                <input id="txtReleaseTime" type="text" class="fm-def" style="width: 200px;" m_required="ReleaseTime" />
                             </td>
                         </tr>
                     </tbody>
@@ -202,72 +100,9 @@
             <div class="space-m"></div>
 
             <div class="subpage-body">
-
-                <ul class="nav nav-tabs">
-                    <li id="tabKor" class="tablink active" onclick="fnChangeTab(this);"><a>한글</a></li>
-                    <li id="tabEng" class="tablink" onclick="fnChangeTab(this);"><a>영어</a></li>
-                </ul>
-
                 <div id="inputField" class="tab-content flex-1 overflow-auto-y p-t-l">
-
-                    <div id="tblKor">
-                        <table width="100%" class="tbl-basic">
-                            <colgroup>
-                                <col width="12%" />
-                                <col width="18%" />
-                                <col width="12%" />
-                                <col width="18%" />
-                                <col width="20%" />
-                                <col width="20%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <th>제목<span class="required">*</span></th>
-                                    <td colspan="5">
-                                        <input id="txtTitle" type="text" class="fm-def" style="width: 100%;" m_required="제목" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>URL</th>
-                                    <td colspan="5">
-                                        <input id="txtUrl" type="text" class="fm-def" style="width: 100%;" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <textarea id="txtEditor" aria-label="editor" style="height:600px;"></textarea>
-                        <input id="txtTempFile" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'ko');" style="display:none;" />
-                    </div>
-
-                    <div id="tblEng" style="display:none;">
-                        <table width="100%" class="tbl-basic">
-                            <colgroup>
-                                <col width="12%" />
-                                <col width="18%" />
-                                <col width="12%" />
-                                <col width="18%" />
-                                <col width="20%" />
-                                <col width="20%" />
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <th>제목<span class="required">*</span></th>
-                                    <td colspan="5">
-                                        <input id="txtTitle_Eng" type="text" class="fm-def" style="width: 100%;" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>URL</th>
-                                    <td colspan="5">
-                                        <input id="txtUrl_Eng" type="text" class="fm-def" style="width: 100%;" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <textarea id="txtEditor_Eng" aria-label="editor" style="height:600px;"></textarea>
-                        <input id="txtTempFile_Eng" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'en');" style="display:none;" />
-                    </div>
-
+                    <input id="txtTempFile_Eng" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'en');" style="display:none;" />
+                    <input id="movieUpload" type="file" class="fm-def" style="width: 100%;" />
                 </div>
             </div>
         </div>
@@ -275,7 +110,7 @@
         <div class="pop-footer">
             <div class="dp-flex">
                 <div class="ml-auto">
-                    <button class="btn page-btn btn-basic" onclick="fnInsertAnnouncements();">저장</button>
+                    <button class="btn page-btn btn-basic" onclick="insertMovieItem();">저장</button>
                     <button class="btn page-btn btn-basic" onclick="m_Popup.Close();">취소</button>
                 </div>
             </div>
