@@ -363,7 +363,7 @@ namespace CloudNativeWeb.Services
                     {
                         InputStream = newMemoryStream,
                         Key = fileGuid,
-                        BucketName = "user01-bucket01",
+                        BucketName = "user01-bucket02",
                         ContentType = files[0].ContentType
                     };
 
@@ -372,24 +372,12 @@ namespace CloudNativeWeb.Services
                 }
 
                 DynamoDBContext context = new DynamoDBContext(client);
-                //MovieFile models = await context.LoadAsync<MovieFile>(title);
-
-                //if (models != null)
-                //{
-                //    DeleteObjectRequest request = new DeleteObjectRequest
-                //    {
-                //        BucketName = "user01-bucket01",
-                //        Key = models.FileName
-                //    };
-
-                //    await s3Client.DeleteObjectAsync(request);
-                //}
 
                 MovieFile movieFile = new MovieFile();
                 movieFile.Title = title;
                 movieFile.FileName = fileGuid;
                 movieFile.FileDisplayName = files[0].FileName;
-                movieFile.BucketName = "user01-bucket01";
+                movieFile.BucketName = "user01-bucket02";
                 movieFile.UpdateDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                 movieFile.UpdateUser = Common.UserInfo.Current.DisplayName;
 
@@ -415,7 +403,7 @@ namespace CloudNativeWeb.Services
             {
                 GetObjectRequest getObjectRequest = new GetObjectRequest
                 {
-                    BucketName = "user01-bucket01",
+                    BucketName = "user01-bucket02",
                     Key = fileName
                 };
 

@@ -85,7 +85,6 @@ namespace CloudNativeWeb.Controllers
                 }
                 else
                 {
-
                     if (returnResult)
                     {
                         identity = new ClaimsIdentity(new[] {

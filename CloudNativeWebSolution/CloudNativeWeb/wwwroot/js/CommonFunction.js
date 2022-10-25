@@ -346,3 +346,25 @@ function fnDisplayFileList() {
 }
 
 
+var m_Loading = {
+    Show: function () {
+        var html = "";
+        html += '<div id="loading">';
+        html += '    <div class="loadingLayer">';
+        html += '        <div class="loadingText">';
+        html += '            <div class="lds-bar">';
+        html += '                <div></div><div></div><div></div>';
+        html += '            </div>';
+        html += '            <span class="lds-bar-txt">LOADING</span>';
+        html += '        </div>';
+        html += '    </div>';
+        html += '</div>';
+
+        $('body').append(html);
+    },
+    Hide: function (winElem) {
+        setTimeout(function () {
+            $(winElem.document).find('body').find('#loading').remove();
+        }, 500)
+    }
+}

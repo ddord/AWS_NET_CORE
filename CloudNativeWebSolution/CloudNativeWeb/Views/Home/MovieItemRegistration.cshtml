@@ -49,9 +49,9 @@
                 async: false,
                 success: function (data) {
                     if (data) {
-                        alert("File Upload Complete");
+                        alert("File upload complete");
                         fnDocumentReadyCommon();
-                        var downLinkHtml = '<a href=/FileDownload?fileName=' + data[0].fileName + '">' + data[0].fileDispalName + "</a>"
+                        var downLinkHtml = '<a href="/Home/FileDownload?fileName=' + data.fileName + '&displayName=' + data.fileDisplayName + '">' + data.fileDisplayName + "</a>";
                         $('#lblFileName').html(downLinkHtml);
                     }
                     else {
@@ -69,29 +69,6 @@
                     m_Loading.Hide(window);
                 }
             });
-        }
-
-        var m_Loading = {
-            Show: function () {
-                var html = "";
-                html += '<div id="loading">';
-                html += '    <div class="loadingLayer">';
-                html += '        <div class="loadingText">';
-                html += '            <div class="lds-bar">';
-                html += '                <div></div><div></div><div></div>';
-                html += '            </div>';
-                html += '            <span class="lds-bar-txt">LOADING</span>';
-                html += '        </div>';
-                html += '    </div>';
-                html += '</div>';
-
-                $('.pop-content').append(html);
-            },
-            Hide: function (winElem) {
-                setTimeout(function () {
-                    $(winElem.document).find('body').find('#loading').remove();
-                }, 500)
-            }
         }
     </script>
 }
@@ -149,23 +126,14 @@
                                 <input id="txtReleaseTime" type="text" class="fm-def" style="width: 200px;" m_required="ReleaseTime" />
                             </td>
                         </tr>
+                        <tr>
+                            <th>Movie File</th>
+                            <td colspan="3">
+                                <label id="lblFileName">File does not exist</label>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="Container">
-                <div id="dragDropArea">
-                    <div class="drag-drop-inside">
-                        <p class="drag-drop-buttons">
-                            <label class="fileInputButton">
-                                ＋ File Add
-                                <input id="fileInput" type="file" style="display:none;" onchange="fnSelectFile();" />
-                            </label>
-                        </p>
-                        <div id="fileList" style="text-align:center;"></div>
-                    </div>
-                </div>
-                <button type="button" class="btn page-btn btn-basic" onclick="fnSendFile();">Upload</button>
             </div>
 
             <div class="space-m"></div>

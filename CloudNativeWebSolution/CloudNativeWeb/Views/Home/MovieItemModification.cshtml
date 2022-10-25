@@ -47,9 +47,9 @@
             }
 
             m_Ajax.Call('@Url.Action("UpdateMovieItem")', updateParam, function (data) {
-                opener.fnDocumentReadyCommon();
                 if (data > 0) {
                     alert("Save.");
+                    opener.fnDocumentReadyCommon();
                     m_Popup.Close();
                 } else {
                     alert("Error: Please check for duplicate titles or other data");
@@ -210,7 +210,7 @@
                     if (data) {
                         alert("File Upload Complete");
                         fnDocumentReadyCommon();
-                        var downLinkHtml = '<a href="/Home/FileDownload?fileName=' + data.fileName + '&displayName=' + data.fileDisplayName + '">' + data.fileDisplayName + "</a>"
+                        var downLinkHtml = '<a href="/Home/FileDownload?fileName=' + data.fileName + '&displayName=' + data.fileDisplayName + '">' + data.fileDisplayName + "</a>";
                         $('#lblFileName').html(downLinkHtml);
                     }
                     else {
@@ -223,28 +223,7 @@
             });
         }
 
-        var m_Loading = {
-            Show: function () {
-                var html = "";
-                html += '<div id="loading">';
-                html += '    <div class="loadingLayer">';
-                html += '        <div class="loadingText">';
-                html += '            <div class="lds-bar">';
-                html += '                <div></div><div></div><div></div>';
-                html += '            </div>';
-                html += '            <span class="lds-bar-txt">LOADING</span>';
-                html += '        </div>';
-                html += '    </div>';
-                html += '</div>';
-
-                $('.pop-content').append(html);
-            },
-            Hide: function (winElem) {
-                setTimeout(function () {
-                    $(winElem.document).find('body').find('#loading').remove();
-                }, 500)
-            }
-        }
+        
     </script>
 }
 <div>

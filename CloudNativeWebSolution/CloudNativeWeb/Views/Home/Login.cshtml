@@ -28,7 +28,7 @@
                 success: function (data) {
                     var jsonValue = JSON.parse(data);
                     if (jsonValue.result == "True") {
-                        location.href = jsonValue.msg;
+                        location.href = "@Url.Action("MovieList")";
                     } else {
                         alert(jsonValue.msg);
                     }
