@@ -183,6 +183,7 @@ var m_Ajax = {
                     alert(response.responseText);
                 }
             }
+
         });
     }
 }
@@ -292,4 +293,56 @@ var m_Upload = {
         }
     }
 }
+
+var formData = new FormData();
+var _FILE_MAX_SIZE = 500;
+
+function fnSelectFile() {
+    var maxsize = _FILE_MAX_SIZE * 1024 * 1024;
+    var input = document.getElementById('fileInput');
+
+    for (var i = 0; i < input.files.length; ++i) {
+        var name = input.files.item(i).name;
+        var size = input.files.item(i).size;
+
+        if (size > maxsize) {
+            alert("Files can be less than or equal to " + _FILE_MAX_SIZE + "Byte.");
+        }
+        else {
+            formData.append("files", input.files[i]);
+        }
+    }
+
+    fnDisplayFileList();
+}
+
+function fnCancelFile(name, size) {
+    var filelist = formData.getAll("files");
+    formData.delete("files");
+    for (var file of filelist) {
+        if (file.name == name && file.size == size) {
+            continue;
+        }
+        formData.append("files", file);
+    }
+
+    fnDisplayFileList();
+}
+
+function fnDisplayFileList() {
+    var children = "";
+    var output = document.getElementById('fileList');
+    filelist = formData.getAll("files");
+    output.innerHTML = children;
+
+    for (var file of filelist) {
+        var name = file.name;
+        var size = file.size;
+        children += '📎&nbsp;&nbsp;&nbsp;' + name + ' ';
+        children += "<span style='cursor:pointer;color:red;' onclick='javascript:fnCancelFile(\"" + name + "\", " + size + ");'>✖</span><Br />";
+    }
+
+    output.innerHTML = children;
+}
+
 

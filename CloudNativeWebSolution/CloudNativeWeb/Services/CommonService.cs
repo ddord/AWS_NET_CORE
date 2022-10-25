@@ -2,12 +2,17 @@
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using CloudNativeWeb.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CloudNativeWeb.Services
@@ -20,7 +25,7 @@ namespace CloudNativeWeb.Services
         {
             _Database = new Common.Database();
         }
-        
+
         public IEnumerable SelectAdminUser(string userId, string password)
         {
             var result = _Database.ExecuteQuery(
@@ -67,9 +72,9 @@ namespace CloudNativeWeb.Services
                     (query,
                     new
                     {
-                        UserId=models.UserId,
-                        Email=models.Email,
-                        Password=models.Password
+                        UserId = models.UserId,
+                        Email = models.Email,
+                        Password = models.Password
                     },
                 CommandType.Text);
             return result;
@@ -94,7 +99,7 @@ namespace CloudNativeWeb.Services
                     if (rating != 11)
                         conditions.Add(new ScanCondition("Rating", ScanOperator.GreaterThanOrEqual, rating));
 
-                    if (genre.ToUpper() == "ALL")
+                    if (genre.ToUpper() != "ALL")
                         conditions.Add(new ScanCondition("Genre", ScanOperator.Equal, genre));
 
                     if (!string.IsNullOrEmpty(title))
@@ -150,7 +155,7 @@ namespace CloudNativeWeb.Services
                 DynamoDBContext context = new DynamoDBContext(client);
                 Movie updateMovie = await context.LoadAsync<Movie>(models.Title);
 
-                if (updateMovie != null)
+                if (updateMovie == null)
                 {
                     models.UpdateDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                     models.UpdateUser = Common.UserInfo.Current.DisplayName;
@@ -161,7 +166,7 @@ namespace CloudNativeWeb.Services
                 {
                     return 0;
                 }
-                
+
             }
             catch (InternalServerErrorException ex)
             {
@@ -288,7 +293,7 @@ namespace CloudNativeWeb.Services
             try
             {
                 DynamoDBContext context = new DynamoDBContext(client);
-                Comment updateModel = await context.LoadAsync<Comment>(models.CommentId);
+                Comment updateModel = await context.LoadAsync<Comment>(models.CommentId, models.Title);
 
                 if (updateModel != null)
                 {
@@ -336,6 +341,123 @@ namespace CloudNativeWeb.Services
             }
 
             return 0;
+        }
+
+        public async Task<MovieFile> UploadFileAsync(List<IFormFile> files, string title)
+        {
+            var s3Client = Common.CloudHelper.s3Client;
+            var client = Common.CloudHelper.dyClient;
+            try
+            {
+
+                if (files is null || files.Count <= 0)
+                    throw new Exception("file is required to upload");
+
+                string fileGuid = Convert.ToString(Guid.NewGuid());
+
+                using (var newMemoryStream = new MemoryStream())
+                {
+                    files[0].CopyTo(newMemoryStream);
+
+                    var uploadRequest = new TransferUtilityUploadRequest
+                    {
+                        InputStream = newMemoryStream,
+                        Key = fileGuid,
+                        BucketName = "user01-bucket01",
+                        ContentType = files[0].ContentType
+                    };
+
+                    var fileTransferUtility = new TransferUtility(s3Client);
+                    await fileTransferUtility.UploadAsync(uploadRequest);
+                }
+
+                DynamoDBContext context = new DynamoDBContext(client);
+                //MovieFile models = await context.LoadAsync<MovieFile>(title);
+
+                //if (models != null)
+                //{
+                //    DeleteObjectRequest request = new DeleteObjectRequest
+                //    {
+                //        BucketName = "user01-bucket01",
+                //        Key = models.FileName
+                //    };
+
+                //    await s3Client.DeleteObjectAsync(request);
+                //}
+
+                MovieFile movieFile = new MovieFile();
+                movieFile.Title = title;
+                movieFile.FileName = fileGuid;
+                movieFile.FileDisplayName = files[0].FileName;
+                movieFile.BucketName = "user01-bucket01";
+                movieFile.UpdateDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+                movieFile.UpdateUser = Common.UserInfo.Current.DisplayName;
+
+                await context.SaveAsync(movieFile);
+
+                return movieFile;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return null;
+        }
+
+        public async Task<byte[]> DownloadFileAsync(string fileName)
+        {
+            var s3Client = Common.CloudHelper.s3Client;
+            var client = Common.CloudHelper.dyClient;
+            MemoryStream ms = null;
+
+            try
+            {
+                GetObjectRequest getObjectRequest = new GetObjectRequest
+                {
+                    BucketName = "user01-bucket01",
+                    Key = fileName
+                };
+
+                using (var response = await s3Client.GetObjectAsync(getObjectRequest))
+                {
+                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        using (ms = new MemoryStream())
+                        {
+                            await response.ResponseStream.CopyToAsync(ms);
+                        }
+                    }
+                }
+
+                if (ms is null || ms.ToArray().Length < 1)
+                    throw new FileNotFoundException(string.Format("The document '{0}' is not found", fileName));
+
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return null;
+        }
+
+        public async Task<MovieFile> SelectFileAsync(string title)
+        {
+            var client = Common.CloudHelper.dyClient;
+            try
+            {
+                DynamoDBContext context = new DynamoDBContext(client);
+                MovieFile models = await context.LoadAsync<MovieFile>(title);
+                return models;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return null;
         }
     }
 }

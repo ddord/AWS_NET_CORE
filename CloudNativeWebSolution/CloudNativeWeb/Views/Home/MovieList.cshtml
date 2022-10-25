@@ -13,11 +13,6 @@
         }
 
         function search() {
-            if ($('#txtTitle').val().length != 0 && $('#txtTitle').val().length < 2) {
-                alert("검색어는 2글자 이상 입력 가능합니다.");
-                return;
-            }
-
             CurrentRating = $('#selectRating').val();
             CurrentGenre = $('#selectGenre').val();
             CurrentTitle = $('#txtTitle').val();
@@ -43,15 +38,14 @@
                         tbodyHtml += '  <td class="align-center">' + (data[i].genre ? data[i].genre : "") + '</td>';
                         tbodyHtml += '  <td class="align-center">' + (data[i].director ? data[i].director : "") + '</td>';
                         tbodyHtml += '  <td class="align-center">' + (data[i].releaseTime ? data[i].releaseTime : "") + '</td>';
-                        tbodyHtml += '  <td class="align-center">' + data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5) + '</td>';
+                        tbodyHtml += '  <td class="align-center">' + (data[i].rating ? data[i].rating : "") + '</td>';
                         tbodyHtml += '  <td class="align-center">' + (data[i].updateUser ? data[i].updateUser : "") + '</td>';
                         tbodyHtml += '</tr>';
                     });
                     $('#movieList').html(tbodyHtml);
 
                 } else {
-                    $('#movieList').html('<td colspan="5">The item does not exist.</td>');
-                    $('#totalCount').html(0 + ' - ' + 0 + ' of ' + 0 + ' items');
+                    $('#movieList').html('<td colspan="6">The item does not exist.</td>');
                 }
             });
         }
@@ -64,7 +58,7 @@
             var title = $(elem).text();
             m_Popup.Open("/Home/MovieItemModification?title=" + title, "Movie Content", 1000, 790);
         }
-</script>
+    </script>
 }
 <div class="sub-content-padding">
     <div class="subpage-header">
@@ -131,7 +125,7 @@
             </ul>
             <div class="space-m"></div>
             <div class="align-right">
-                <button class="btn sub-btn btn-basic-outline" onclick="fnSearch();"><i class="icon-fux-search m-r-xs"></i>Select</button>
+                <button class="btn sub-btn btn-basic-outline" onclick="search();"><i class="icon-fux-search m-r-xs"></i>Select</button>
             </div>
         </div>
 
@@ -142,7 +136,7 @@
                 <h5 class="ft-blue b">Movie List</h5>
             </div>
             <div class="ml-auto">
-                <button class="btn sub-btn btn-basic-outline" onclick="fnCallAdd();">New</button>
+                <button class="btn sub-btn btn-basic-outline" onclick="callAdd();">New</button>
             </div>
         </div>
 
@@ -164,8 +158,8 @@
                         <th class="align-center">Genre</th>
                         <th class="align-center">Director</th>
                         <th class="align-center">Release Time</th>
-                        <th class="align-center">Update Date</th>
-                        <th class="align-center">Update User</th>
+                        <th class="align-center">Rating</th>
+                        <th class="align-center">Author</th>
                     </tr>
                 </thead>
                 <tbody id="movieList"></tbody>
@@ -173,13 +167,5 @@
         </div>
 
         <div class="space-m"></div>
-
-        <div class="pagination-wrap">
-            <div class="align-left"><span class="ft-gray ft-s" id="totalCount"></span></div>
-            <div class="align-center">
-                <ul class="pagination" id="pageField"></ul>
-            </div>
-            <div class="align-right"></div>
-        </div>
     </div>
 </div>
