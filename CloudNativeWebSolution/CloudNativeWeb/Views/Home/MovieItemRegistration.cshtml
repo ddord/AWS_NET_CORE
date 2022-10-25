@@ -27,9 +27,9 @@
             }
 
             m_Ajax.Call('@Url.Action("InsertMovieItem")', insertParam, function (data) {
-                opener.fnDocumentReadyCommon();
                 if (data > 0) {
                     alert("Save.");
+                    opener.fnDocumentReadyCommon()
                     m_Popup.Close();
                 } else {
                     alert("Error: Please check for duplicate titles or other data");
@@ -37,62 +37,6 @@
             });
         }
 
-        function fnSendFile() {
-            formData.append("title", currentId);
-
-            $.ajax({
-                url: '/Home/FileUpload',
-                type: "POST",
-                contentType: false,
-                processData: false,
-                data: formData,
-                async: false,
-                success: function (data) {
-                    if (data) {
-                        alert("File Upload Complete");
-                        fnDocumentReadyCommon();
-                        var downLinkHtml = '<a href=/FileDownload?fileName=' + data[0].fileName + '">' + data[0].fileDispalName + "</a>"
-                        $('#lblFileName').html(downLinkHtml);
-                    }
-                    else {
-                        alert("File upload failed");
-                        $('#lblFileName').text("File does not exist.");
-                    }
-                },
-                error: function (err) {
-                    alert(err.statusText);
-                },
-                beforeSend: function () {
-                    m_Loading.Show();
-                },
-                complete: function () {
-                    m_Loading.Hide(window);
-                }
-            });
-        }
-
-        var m_Loading = {
-            Show: function () {
-                var html = "";
-                html += '<div id="loading">';
-                html += '    <div class="loadingLayer">';
-                html += '        <div class="loadingText">';
-                html += '            <div class="lds-bar">';
-                html += '                <div></div><div></div><div></div>';
-                html += '            </div>';
-                html += '            <span class="lds-bar-txt">LOADING</span>';
-                html += '        </div>';
-                html += '    </div>';
-                html += '</div>';
-
-                $('.pop-content').append(html);
-            },
-            Hide: function (winElem) {
-                setTimeout(function () {
-                    $(winElem.document).find('body').find('#loading').remove();
-                }, 500)
-            }
-        }
     </script>
 }
 <div>
@@ -153,29 +97,21 @@
                 </table>
             </div>
 
-            <div class="Container">
-                <div id="dragDropArea">
-                    <div class="drag-drop-inside">
-                        <p class="drag-drop-buttons">
-                            <label class="fileInputButton">
-                                ＋ File Add
-                                <input id="fileInput" type="file" style="display:none;" onchange="fnSelectFile();" />
-                            </label>
-                        </p>
-                        <div id="fileList" style="text-align:center;"></div>
-                    </div>
-                </div>
-                <button type="button" class="btn page-btn btn-basic" onclick="fnSendFile();">Upload</button>
-            </div>
-
             <div class="space-m"></div>
+
+            <div class="subpage-body">
+                <div id="inputField" class="tab-content flex-1 overflow-auto-y p-t-l">
+                    <input id="txtTempFile_Eng" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'en');" style="display:none;" />
+                    <input id="movieUpload" type="file" class="fm-def" style="width: 100%;" />
+                </div>
+            </div>
         </div>
 
         <div class="pop-footer">
             <div class="dp-flex">
                 <div class="ml-auto">
-                    <button class="btn page-btn btn-basic" onclick="insertMovieItem();">Save</button>
-                    <button class="btn page-btn btn-basic" onclick="m_Popup.Close();">Cancel</button>
+                    <button class="btn page-btn btn-basic" onclick="insertMovieItem();">저장</button>
+                    <button class="btn page-btn btn-basic" onclick="m_Popup.Close();">취소</button>
                 </div>
             </div>
         </div>

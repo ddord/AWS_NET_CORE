@@ -2,7 +2,6 @@
 using CloudNativeWeb.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -161,29 +160,10 @@ namespace CloudNativeWeb.Controllers
             return Json(result);
         }
 
-        public async Task<IActionResult> UpdateComment(Comment models)
+        public async Task<IActionResult> Updatecomment(Comment models)
         {
             var result = await _commonService.UpdateComment(models);
             return Json(result);
-        }
-
-        public async Task<IActionResult> SeclectFileItem(string title)
-        {
-            var result = await _commonService.SelectFileAsync(title);
-            return Json(result);
-        }
-
-        public async Task<IActionResult> FileUpload(List<IFormFile> files, string title)
-        {
-            var result = await _commonService.UploadFileAsync(files, title);
-            return Json(result);
-        }
-
-        [HttpGet]
-        public IActionResult FileDownload(string fileName, string displayName)
-        {
-            var result = _commonService.DownloadFileAsync(fileName).Result;
-            return File(result, "application/octet-stream", displayName);
         }
 
     }
