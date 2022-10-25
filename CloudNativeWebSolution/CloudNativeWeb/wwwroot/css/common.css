@@ -1724,3 +1724,38 @@ tr.total th, tr.total td { background:#fff1e6; color:#ef2a54; font-weight:700;}
 .fm-label-flex {display: flex !important; vertical-align: top; align-items: flex-start;}
 .fm-label-flex input[type='checkbox'] {margin-top:5px; margin-right:6px;}
 .fm-label-flex.line-clamp-2 {max-height:2.8em; height:auto !important;}
+
+#dragDropArea{
+    background-color: #f4f4f4;
+    margin: 10px;
+    padding: 10px;
+    border: #ddd solid 2px;
+    min-height: 200px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+#dragDropArea p{
+    color: #999;
+    font-weight: bold;
+    font-size: 14px;
+    font-size: 1.4em;
+}
+#dragDropArea .drag-drop-buttons{
+    margin-top: 20px;
+    font-size: 12px;
+    font-size: 1.2em;
+}
+.drag-drop-buttons input{
+    margin: auto;
+}
+
+.fileInputButton {
+    color: white;  
+    padding: 10px;
+    border-radius: 10px;
+    cursor:pointer;
+    background-color: #008fd5;
+    border: 1px solid #1082ea;
+}
+
