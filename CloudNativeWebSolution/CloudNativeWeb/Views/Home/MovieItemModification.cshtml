@@ -9,7 +9,6 @@
 
         function fnDocumentReadyCommon() {
             selectMovieItem();
-            selectFileItem();
             selectCommentList();
         }
 
@@ -40,16 +39,16 @@
             }
 
             var updateParam = {
-                title: currentId,
+                title: $('#txtTitle').val().trim(),
                 genre: $('#selectGenre').val(),
                 director: $('#txtDirector').val().trim(),
                 releaseTime: $('#txtReleaseTime').val().trim()
             }
 
             m_Ajax.Call('@Url.Action("UpdateMovieItem")', updateParam, function (data) {
-                opener.fnDocumentReadyCommon();
                 if (data > 0) {
                     alert("Save.");
+                    opener.fnDocumentReadyCommon();
                     m_Popup.Close();
                 } else {
                     alert("Error: Please check for duplicate titles or other data");
@@ -59,7 +58,7 @@
 
         function selectCommentList() {
             var param = {
-                title: currentId
+                title: $('#txtTitle').val().trim()
             }
 
             m_Ajax.Call('@Url.Action("SelectCommentList")', param, function (data) {
@@ -95,15 +94,35 @@
 
             var param = {
                 updateUser: userDPName,
-                title: currentId,
+                title: $('#txtTitle').val().trim(),
                 commentContent: $('#txtCommentContent').val().trim(),
                 rating: $('#selectRating').val()
             };
 
             m_Ajax.Call('@Url.Action("InsertComment")', param, function (data) {
                 if (data) {
+                    //var tbodyHtml = "";
+                    //$(data).each(function (i) {
+                    //    tbodyHtml += '<tr>';
+                    //    tbodyHtml += '  <td class="align-center">' + (data[i].updateUser ? data[i].updateUser : "") + '<input type="hidden" id="hidCommentId_' + data[i].commentId + ' /></td>';
+                    //    tbodyHtml += '  <td class="align-center">' + (data[i].comment ? data[i].comment : "") + '</td>';
+                    //    tbodyHtml += '  <td class="align-center">' + (data[i].rating ? data[i].rating.toString() + "/10" : "0/10") + '</td>';
+                    //    tbodyHtml += '  <td class="align-center">' + data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5) + '</td>';
+                    //    const d1 = new Date(data[i].updateDate.split('T')[0] + ' ' + data[i].updateDate.split('T')[1].substring(0, 5));
+                    //    const d2 = new Date();
+                    //    d2.setDate(d2.getDate() - 1);
+                    //    if (userDPName == data[i].updateUser && d2.getTime() < d1.getTime()) {
+                    //        tbodyHtml += '  <td class="align-center"><button class="btn-round sub-btn btn-gray" onclick="editComment(this)"><i class="icon-fux-write"></i></button></td >';
+                    //    } else {
+                    //        tbodyHtml += '  <td></td>';
+                    //    }
+
+                    //    tbodyHtml += '</tr>';
+                    //});
+                    //$('#commentList').html(tbodyHtml);
+
                     alert("Save.");
-                    fnDocumentReadyCommon();
+                    opener.fnDocumentReadyCommon();
                 } else {
                     alert("Error: Please check for duplicate titles or other data");
                 }
@@ -139,24 +158,36 @@
             var td = clickRow.children();
 
             var getCommentId = $($(td[0]).find("[id*=hidCommentId_]")).attr('id').replace('hidCommentId_', '');
-            var getRating = $(td[2]).children(0).val();
-            if (getRating > 10)
-                getRating = 10;
-            else if (getRating < 0)
-                getRating = 0;
-
+            var getRating = $(td[2]).text().replace('/10', '');
             var param = {
                 updateUser: userDPName,
-                title: currentId,
+                title: $('#txtTitle').val().trim(),
                 commentId: getCommentId,
                 commentContent: $(td[1]).children(0).val().trim(),
                 rating: getRating
             };
 
-            m_Ajax.Call('@Url.Action("UpdateComment")', param, function (data) {
-                if (data) {
-                    alert("Update.");
-                    fnDocumentReadyCommon();
+            m_Ajax.Call('@Url.Action("UpdateCommentItem")', param, function (data) {
+                if (data == null)
+                    alert("Error: Please check for data");
+                else if (data && data.d && data.d.length > 0) {
+
+                    td.eq(1)[0].innerHTML = (data[0].comment ? data[0].comment : "");
+                    td.eq(2)[0].innerHTML = (data[0].rating ? data[0].rating.toString() + "/10" : "0/10");
+                    td.eq(3)[0].innerHTML = data[0].updateDate.split('T')[0] + ' ' + data[0].updateDate.split('T')[1].substring(0, 5);
+
+                    td.eq(1)[0].outerHTML = '<td class="align-center">' + td.eq(4)[0].innerHTML.replace(/<(input)([^>]*)>/gi, "") + '</td>';
+                    td.eq(2)[0].outerHTML = '<td class="align-center">' + td.eq(5)[0].innerHTML.replace(/<(input)([^>]*)>/gi, "") + '</td>';
+
+                    const d1 = new Date(data[0].updateDate.split('T')[0] + ' ' + data[0].updateDate.split('T')[1].substring(0, 5));
+                    const d2 = new Date();
+                    d2.setDate(d2.getDate() - 1);
+                    if (userDPName == data[i].updateUser && d2.getTime() < d1.getTime()) {
+                        tbodyHtml += '  <td class="align-center"><button class="btn-round sub-btn btn-gray" onclick="editComment(this)"><i class="icon-fux-write"></i></button></td >';
+                    } else {
+                        tbodyHtml += '  <td></td>';
+                    }
+                    alert("Update");
                 } else {
                     alert("Error: Please check for data");
                 }
@@ -179,71 +210,6 @@
             }
 
             td.eq(4)[0].innerHTML = changeHtml;
-        }
-
-        function selectFileItem() {
-            var param = {
-                title: currentId
-            }
-
-            m_Ajax.Call('@Url.Action("SeclectFileItem")', param, function (data) {
-                if (data) {
-                    var downLinkHtml = '<a href="/Home/FileDownload?fileName=' + data.fileName + '&displayName=' + data.fileDisplayName +  '">' + data.fileDisplayName + '</a>';
-                    $('#lblFileName').html(downLinkHtml);
-                } else {
-                    $('#lblFileName').text("File does not exist.");
-                }
-            });
-        }
-
-        function fnSendFile() {
-            formData.append("title", currentId);
-
-            $.ajax({
-                url: '/Home/FileUpload',
-                type: "POST",
-                contentType: false,
-                processData: false,
-                data: formData,
-                async: false,
-                success: function (data) {
-                    if (data) {
-                        alert("File Upload Complete");
-                        fnDocumentReadyCommon();
-                        var downLinkHtml = '<a href="/Home/FileDownload?fileName=' + data.fileName + '&displayName=' + data.fileDisplayName + '">' + data.fileDisplayName + "</a>"
-                        $('#lblFileName').html(downLinkHtml);
-                    }
-                    else {
-                        alert("File upload failed");
-                    }
-                },
-                error: function (err) {
-                    alert(err.statusText);
-                }
-            });
-        }
-
-        var m_Loading = {
-            Show: function () {
-                var html = "";
-                html += '<div id="loading">';
-                html += '    <div class="loadingLayer">';
-                html += '        <div class="loadingText">';
-                html += '            <div class="lds-bar">';
-                html += '                <div></div><div></div><div></div>';
-                html += '            </div>';
-                html += '            <span class="lds-bar-txt">LOADING</span>';
-                html += '        </div>';
-                html += '    </div>';
-                html += '</div>';
-
-                $('.pop-content').append(html);
-            },
-            Hide: function (winElem) {
-                setTimeout(function () {
-                    $(winElem.document).find('body').find('#loading').remove();
-                }, 500)
-            }
         }
     </script>
 }
@@ -304,26 +270,12 @@
                         <tr>
                             <th>Movie File</th>
                             <td colspan="3">
-                                <label id="lblFileName">File does not exist</label>
+                                <input id="txtTempFile_Eng" type="file" accept=".gif, .jpg, .png" onchange="m_Editor.ImageUpload(event, currentId, 'en');" style="display:none;" />
+                                <input id="movieUpload" type="file" class="fm-def" style="width: 100%;" />
                             </td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="Container">
-                <div id="dragDropArea">
-                    <div class="drag-drop-inside">
-                        <p class="drag-drop-buttons">
-                            <label class="fileInputButton">
-                                ＋ File Add
-                                <input id="fileInput" type="file" style="display:none;" onchange="javascript:fnSelectFile();" />
-                            </label>
-                        </p>
-                        <div id="fileList" style="text-align:center;"></div>
-                    </div>
-                </div>
-                <button type="button" class="btn page-btn btn-basic" onclick="javascript:fnSendFile();">Upload</button>
             </div>
 
             <div class="space-m"></div>
@@ -360,7 +312,7 @@
                         <div class="ml-auto">
                             <button onclick="insertComment();" class="btn sub-btn btn-basic-outline">Write</button>
                         </div>
-                    </div>
+                        </div>
                     <div class="space-s"></div>
                     <table width="100%" class="grd">
                         <colgroup>
@@ -385,8 +337,8 @@
         <div class="pop-footer">
             <div class="dp-flex">
                 <div class="ml-auto">
-                    <button class="btn page-btn btn-basic" onclick="updateMovieItem();">Update</button>
-                    <button class="btn page-btn btn-basic" onclick="m_Popup.Close();">Cancel</button>
+                    <button class="btn page-btn btn-basic" onclick="updateMovieItem();">저장</button>
+                    <button class="btn page-btn btn-basic" onclick="m_Popup.Close();">취소</button>
                 </div>
             </div>
         </div>
